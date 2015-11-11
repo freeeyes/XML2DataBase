@@ -36,6 +36,9 @@
     <ClInclude Include="ClassCreate.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DBOperationCreate.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="XML2DataBase.cpp">
@@ -57,6 +60,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ClassCreate.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DBOperationCreate.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

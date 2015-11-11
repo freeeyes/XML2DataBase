@@ -4,12 +4,14 @@
 #include <stdio.h>
 #include "XmlOpeation.h"
 #include "ClassCreate.h"
+#include "DBOperationCreate.h"
 
 int main(int argc, char* argv[])
 {
 	CXmlOpeation      obj_XmlOpeation;
 	_Proc_Info        obj_Proc_Info;
 	_Proc_Define_Info obj_Proc_Define_Info;
+	_DB_Proc          obj_DB_Proc;
 
 	obj_XmlOpeation.Parse_XML_define_File("define.xml", obj_Proc_Define_Info);
 
@@ -21,7 +23,11 @@ int main(int argc, char* argv[])
 		getchar();
 	}
 
+	obj_XmlOpeation.Parse_XML_DB_File("dbconfig.xml", obj_DB_Proc);
+
 	Create_Proc(obj_Proc_Define_Info, obj_Proc_Info);
+
+	Create_DB_Proc(obj_DB_Proc);
 
 	return 0;
 }

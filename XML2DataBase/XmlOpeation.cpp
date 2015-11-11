@@ -157,14 +157,13 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, _Proc_Info& obj_Proc_Info)
 	TiXmlNode* pMainNode = NULL;
 	//获得根元素
 	m_pRootElement = m_pTiXmlDocument->RootElement();
-	sprintf_safe(obj_Proc_Info.m_szProcName, MAX_BUFF_50, "%s", m_pRootElement->ToElement()->Attribute("ProcName"));
-
-
+	
 	//循环打印出每一个变量
 	if(NULL == m_pRootElement)
 	{
 		return false;
 	}
+	sprintf_safe(obj_Proc_Info.m_szProcName, MAX_BUFF_50, "%s", m_pRootElement->ToElement()->Attribute("ProcName"));
 
 	//获得根元素的子元素
 	for(pMainNode = m_pRootElement->FirstChildElement();pMainNode;pMainNode=pMainNode->NextSiblingElement())
@@ -257,7 +256,6 @@ bool CXmlOpeation::Parse_XML_define_File(char* pFileName, _Proc_Define_Info& obj
 	{
 		_Define_Info obj_Define_Info;
 
-		//获得Lua文件信息
 		int nMainType = pMainNode->Type();
 
 		if(nMainType != TiXmlText::TINYXML_ELEMENT)
@@ -270,6 +268,89 @@ bool CXmlOpeation::Parse_XML_define_File(char* pFileName, _Proc_Define_Info& obj
 		sprintf_safe(obj_Define_Info.m_szTagType, MAX_BUFF_50, "%s", pMainElement->Attribute("tagType"));
 		sprintf_safe(obj_Define_Info.m_szDesc, MAX_BUFF_100, "%s", pMainElement->Attribute("desc"));
 		obj_Proc_Define_Info.obj_vec_Define_Info.push_back(obj_Define_Info);
+	}
+
+	delete m_pTiXmlDocument;
+	m_pTiXmlDocument = NULL;
+
+	return true;
+}
+
+bool CXmlOpeation::Parse_XML_DB_File( char* pFileName, _DB_Proc& obj_DB_Proc )
+{
+	Close();
+	m_pTiXmlDocument = new TiXmlDocument(pFileName);
+	if(NULL == m_pTiXmlDocument)
+	{
+		return false;
+	}
+
+	if(false == m_pTiXmlDocument->LoadFile())
+	{
+		return false;
+	}
+
+	TiXmlNode* pMainNode     = NULL;
+	TiXmlNode* pColumnNode   = NULL;
+
+	//获得根元素
+	m_pRootElement = m_pTiXmlDocument->RootElement();
+
+	if(NULL == m_pRootElement)
+	{
+		return false;
+	}
+
+	//获得工程名称
+	sprintf_safe(obj_DB_Proc.m_szProcName, MAX_BUFF_50, "%s", (char* )m_pRootElement->Attribute("ProcName"));
+	sprintf_safe(obj_DB_Proc.m_szDBType, MAX_BUFF_50, "%s", (char* )m_pRootElement->Attribute("DB"));
+
+	//目前先考虑只支持mysql
+	if(strcmp("mysql", obj_DB_Proc.m_szDBType) != 0)
+	{
+		return false;
+	}
+
+	for(pMainNode = m_pRootElement->FirstChildElement();pMainNode;pMainNode=pMainNode->NextSiblingElement())
+	{
+		_DB_Table obj_DB_Table;
+		int nMainType = pMainNode->Type();
+
+		if(nMainType != TiXmlText::TINYXML_ELEMENT)
+		{
+			continue;
+		}
+
+		TiXmlElement* pMainElement = pMainNode->ToElement();
+		sprintf_safe(obj_DB_Table.m_szTableName, MAX_BUFF_50, "%s", pMainElement->Attribute("name"));
+		sprintf_safe(obj_DB_Table.m_szClassName, MAX_BUFF_50, "%s", pMainElement->Attribute("class"));
+
+		//循环遍历列内容
+		for(pColumnNode = pMainElement->FirstChildElement();pColumnNode;pColumnNode=pColumnNode->NextSiblingElement())
+		{
+			_DB_Column obj_DB_Column;
+
+			int nColumnType = pColumnNode->Type();
+
+			if(nColumnType != TiXmlText::TINYXML_ELEMENT)
+			{
+				continue;
+			}
+
+			TiXmlElement* pColumnElement = pColumnNode->ToElement();
+			sprintf_safe(obj_DB_Column.m_szDBName, MAX_BUFF_50, "%s", pColumnElement->Attribute("name"));
+			sprintf_safe(obj_DB_Column.m_szDBType, MAX_BUFF_50, "%s", pColumnElement->Attribute("type"));
+			sprintf_safe(obj_DB_Column.m_szClassParam, MAX_BUFF_100, "%s", pColumnElement->Attribute("classparam"));
+			if(NULL != pColumnElement->Attribute("IsKey"))
+			{
+				obj_DB_Column.m_nIskey = atoi(pColumnElement->Attribute("IsKey"));
+			}
+
+			obj_DB_Table.m_vec_DB_Column.push_back(obj_DB_Column);
+
+		}
+
+		obj_DB_Proc.m_vec_DB_Table.push_back(obj_DB_Table);
 	}
 
 	delete m_pTiXmlDocument;

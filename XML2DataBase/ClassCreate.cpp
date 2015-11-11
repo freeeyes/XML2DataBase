@@ -37,9 +37,9 @@ void Check_Include_File(_Class_Info obj_Class_Info, _Proc_Info obj_Proc_Info, ve
 
 void Create_Environment(_Proc_Info& obj_Proc_Info)
 {
-	char szTempPath[50]   = {'\0'};
+	char szTempPath[MAX_BUFF_50]   = {'\0'};
 
-	sprintf_safe(szTempPath, 50, "%s", obj_Proc_Info.m_szProcName);
+	sprintf_safe(szTempPath, MAX_BUFF_50, "%s", obj_Proc_Info.m_szProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
 #else
@@ -47,7 +47,7 @@ void Create_Environment(_Proc_Info& obj_Proc_Info)
 #endif
 
 	//´´½¨LuaIncodeÄ¿Â¼
-	sprintf_safe(szTempPath, 50, "%s/DataWrapper", obj_Proc_Info.m_szProcName);
+	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DataWrapper", obj_Proc_Info.m_szProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
 #else
@@ -230,7 +230,7 @@ bool Create_Class_H(_Proc_Info& obj_Proc_Info)
 			}
 			else
 			{
-				sprintf_safe(szTemp, 200, "\tC%s m_obj_%s; //%s\n", 
+				sprintf_safe(szTemp, 200, "\t%s m_obj_%s; //%s\n", 
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szProperyType,
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName,
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szDesc);
@@ -299,7 +299,7 @@ bool Create_Class_CPP(_Proc_Info& obj_Proc_Info)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tm_obj_%s = %s;\n", 
+				sprintf_safe(szTemp, 200, "\tm_obj_%s = obj_%s;\n", 
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName,
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

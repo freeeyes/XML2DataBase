@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<configer ProcName="DBTest" DB="mysql">
+	<Table name="tb_Grid" class="CGrid">
+		<Column name="id" type="int" classparam="" IsKey="1" />
+		<Column name="gridIndex" type="int" classparam="GridIndex" />
+		<Column name="GridType" type="int" classparam="GridType" />
+		<Column name="GridItemID" type="int" classparam="GridItemID" />
+	</Table>
+	
+	<Table name="CUserData" class="CUserData">
+		<Column name="ID" type="int" classparam="ID" IsKey="1" />
+		<Column name="Nick" type="char" length="20" classparam="Nick" />
+		<Column name="Job" type="int" classparam="Job" />
+		<Column name="Ablity" type="int" classparam="Ablity" />
+		<Column name="Ablity" type="int" classparam="Ablity" />
+	</Table>	
+</configer>

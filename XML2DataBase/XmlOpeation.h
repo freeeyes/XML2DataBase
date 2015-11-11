@@ -27,6 +27,7 @@ public:
 
   bool Parse_XML_File(char* pFileName, _Proc_Info& obj_Proc_Info);
   bool Parse_XML_define_File(char* pFileName, _Proc_Define_Info& obj_Proc_Define_Info);
+  bool Parse_XML_DB_File(char* pFileName, _DB_Proc& obj_DB_Proc);
 
   void Close();
 

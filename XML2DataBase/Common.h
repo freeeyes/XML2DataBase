@@ -10,11 +10,15 @@
 #include <stdarg.h>
 #include <vector>
 #include <ctype.h>
+#include<iostream>
+#include<fstream>
 
 using namespace std;
 
-#define MAX_BUFF_50  50
-#define MAX_BUFF_100 100
+#define MAX_BUFF_50   50
+#define MAX_BUFF_100  100
+#define MAX_BUFF_500  500
+#define MAX_BUFF_1024 1024
 
 //属性信息
 struct _Property
@@ -102,6 +106,51 @@ struct _Include_Info
 };
 typedef vector<_Include_Info> vec_Include_Info;
 
+//数据库操作相关
+struct _DB_Column
+{
+	char m_szDBName[MAX_BUFF_50];
+	char m_szDBType[MAX_BUFF_50];
+	char m_szClassParam[MAX_BUFF_50];
+	int  m_nIskey;
+
+	_DB_Column()
+	{
+		m_nIskey          = 0;
+		m_szDBName[0]     = '\0';
+		m_szDBType[0]     = '\0';
+		m_szClassParam[0] = '\0';
+	}
+};
+typedef vector<_DB_Column> vec_DB_Column;
+
+struct _DB_Table
+{
+	char m_szTableName[MAX_BUFF_50];
+	char m_szClassName[MAX_BUFF_50];
+	vec_DB_Column m_vec_DB_Column;
+
+	_DB_Table()
+	{
+		m_szTableName[0] = '\0';
+		m_szClassName[0] = '\0';
+	}
+};
+typedef vector<_DB_Table> vec_DB_Table;
+
+struct _DB_Proc
+{
+	char m_szProcName[MAX_BUFF_50];
+	char m_szDBType[MAX_BUFF_50];
+	vec_DB_Table m_vec_DB_Table;
+
+	_DB_Proc()
+	{
+		m_szProcName[0] = '\0';
+		m_szDBType[0]   = '\0';
+	}
+};
+
 static void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
 	if(szText == NULL)
@@ -127,6 +176,13 @@ static void To_Upper_String(const char* pSrc, char* pRet)
 		pRet[i] = toupper(pSrc[i]);
 	}
 	pRet[nLen] = '\0';
+}
+
+static void Tranfile(const char* pFileSrc, const char* pFileDes)
+{
+	fstream fsCopee( pFileSrc, ios::binary | ios::in ) ;
+	fstream fsCoper( pFileDes, ios::binary | ios::out ) ;
+	fsCoper << fsCopee.rdbuf() ;
 }
 
 #endif

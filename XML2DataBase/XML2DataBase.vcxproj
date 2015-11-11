@@ -85,12 +85,14 @@
   <ItemGroup>
     <ClInclude Include="ClassCreate.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="DBOperationCreate.h" />
     <ClInclude Include="TinyXML\tinystr.h" />
     <ClInclude Include="TinyXML\tinyxml.h" />
     <ClInclude Include="XmlOpeation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassCreate.cpp" />
+    <ClCompile Include="DBOperationCreate.cpp" />
     <ClCompile Include="TinyXML\tinystr.cpp" />
     <ClCompile Include="TinyXML\tinyxml.cpp" />
     <ClCompile Include="TinyXML\tinyxmlerror.cpp" />
