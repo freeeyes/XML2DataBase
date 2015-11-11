@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<configer ProcName="DBTest">
+	<CGrid desc="Bag Grid">
+		<GridIndex desc="Bag grid Index">uint8</GridIndex> 
+		<GridType desc="Bag Type">uint8</GridType> 
+		<GridItemID desc="ItemID">uint32</GridItemID>
+	</CGrid>
+
+	<CBag desc="Bag Info">
+		<BagLimit desc="Bag max grid">uint8</BagLimit>
+		<GridList length="20" desc="Grid List">CGrid</GridList>
+	</CBag>
+
+	<CUserData PoolCount="20" desc="user info">
+		<ID desc="user ID">uint32</ID>
+		<Nick length="20" desc="nick">char</Nick>
+		<Job desc="job">uint8</Job>
+		<Ablity desc="ablity">uint16</Ablity>
+		<UserBag1 desc="bag1">CBag</UserBag1>
+		<UserBag2 desc="bag2">CBag</UserBag2>
+	</CUserData>	
+</configer>
