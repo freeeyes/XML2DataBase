@@ -307,8 +307,8 @@ bool Create_Class_CPP(_Proc_Info& obj_Proc_Info)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 				sprintf_safe(szTemp, 200, "%s %s::get_%s()\n", 
-					obj_Proc_Info.obj_vec_Class_Info[i].m_szXMLName,
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szProperyType,
+					obj_Proc_Info.obj_vec_Class_Info[i].m_szXMLName,
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "{\n");
