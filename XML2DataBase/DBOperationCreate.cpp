@@ -228,14 +228,14 @@ bool Create_DB_H(_DB_Proc& obj_DB_Proc)
 
 		if(nParamIndex > 0)
 		{
-			sprintf_safe(szTemp, 200, "bool Insert_%s(%s%s obj_%s);\n\n", 
+			sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s);\n\n", 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				szParam, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "bool Update_%s(%s%s obj_%s);\n\n", 
+			sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s);\n\n", 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				szParam, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
@@ -244,13 +244,13 @@ bool Create_DB_H(_DB_Proc& obj_DB_Proc)
 		}
 		else
 		{
-			sprintf_safe(szTemp, 200, "bool Insert_%s(%s obj_%s);\n\n", 
+			sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s obj_%s);\n\n", 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "bool Update_%s(%s obj_%s);\n\n",
+			sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s obj_%s);\n\n",
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
@@ -306,7 +306,7 @@ bool Create_DB_CPP(_DB_Proc& obj_DB_Proc)
 
 		if(nParamIndex > 0)
 		{
-			sprintf_safe(szTemp, 200, "bool Insert_%s(%s%s obj_%s)\n", 
+			sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s)\n", 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				szParam, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
@@ -325,7 +325,7 @@ bool Create_DB_CPP(_DB_Proc& obj_DB_Proc)
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "bool Update_%s(%s%s obj_%s)\n", 
+			sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s)\n", 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				szParam, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
@@ -351,7 +351,7 @@ bool Create_DB_CPP(_DB_Proc& obj_DB_Proc)
 		}
 		else
 		{
-			sprintf_safe(szTemp, 200, "bool Insert_%s(%s obj_%s)\n", 
+			sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s obj_%s)\n", 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
@@ -369,7 +369,7 @@ bool Create_DB_CPP(_DB_Proc& obj_DB_Proc)
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "bool Update_%s(%s obj_%s)\n",
+			sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s obj_%s)\n",
 				obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
 				obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
