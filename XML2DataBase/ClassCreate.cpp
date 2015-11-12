@@ -207,10 +207,34 @@ bool Create_Class_H(_Proc_Info& obj_Proc_Info)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		for(int j = 0; j < (int)obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty.size(); j++)
 		{
-			sprintf_safe(szTemp, 200, "\t\tthis->m_obj_%s = ar.m_obj_%s;\n",
-				obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName,
-				obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_nLength == 0)
+			{
+				sprintf_safe(szTemp, 200, "\t\tthis->m_obj_%s = ar.m_obj_%s;\n",
+					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName,
+					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else if(obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_nLength > 0 && strcmp(obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szProperyType, "char") == 0)
+			{
+				sprintf_safe(szTemp, 200, "\t\tsprintf(this->m_obj_%s, \"%%s\", ar.m_obj_%s);\n",
+					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName,
+					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\t\tfor(int i = 0; i < %d; i++)", obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_nLength);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t{");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t\tthis->m_obj_%s[i] = ar.m_obj_%s[i];\n",
+					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName,
+					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t}");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
 		}
 		sprintf_safe(szTemp, 200, "\t};\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -221,7 +245,7 @@ bool Create_Class_H(_Proc_Info& obj_Proc_Info)
 		{
 			if(obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_nLength > 0)
 			{
-				sprintf_safe(szTemp, 200, "\tC%s m_obj_%s[%d]; //%s\n", 
+				sprintf_safe(szTemp, 200, "\t%s m_obj_%s[%d]; //%s\n", 
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szProperyType,
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_szPropertyName,
 					obj_Proc_Info.obj_vec_Class_Info[i].m_vecProperty[j].m_nLength,
@@ -237,8 +261,11 @@ bool Create_Class_H(_Proc_Info& obj_Proc_Info)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
 		}
-		sprintf_safe(szTemp, 200, "};\n");
+		sprintf_safe(szTemp, 200, "};\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//判断是否有Pool需要声明
+
 
 		sprintf_safe(szTemp, 200, "#endif\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

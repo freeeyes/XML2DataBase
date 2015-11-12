@@ -2,7 +2,7 @@
 
 <!-- add by freeeyes -->
 <configer ProcName="DBTest" DB="mysql">
-	<Table name="tb_Grid" class="CGrid">
+	<Table name="tb_Grid" class="CGrid" Func="selct;insert;update;delete;">
 		<Column name="id" type="int" classparam="" IsKey="1" />
 		<Column name="gridIndex" type="int" classparam="GridIndex" />
 		<Column name="GridType" type="int" classparam="GridType" />
