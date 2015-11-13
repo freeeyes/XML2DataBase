@@ -13,9 +13,9 @@ int main(int argc, char* argv[])
 	_Proc_Define_Info obj_Proc_Define_Info;
 	_DB_Proc          obj_DB_Proc;
 
-	obj_XmlOpeation.Parse_XML_define_File("define.xml", obj_Proc_Define_Info);
+	obj_XmlOpeation.Parse_XML_Define_File("define.xml", obj_Proc_Define_Info);
 
-	bool blState = obj_XmlOpeation.Parse_XML_File("protocol.xml", obj_Proc_Info);
+	bool blState = obj_XmlOpeation.Parse_XML_Class_File("protocol.xml", obj_Proc_Info);
 	if(false == blState)
 	{
 		printf("[Main]Get XML(protocol.xml) error.\n");

@@ -140,7 +140,7 @@ char* CXmlOpeation::GetData_Text(const char* pName, TiXmlElement*& pNextTiXmlEle
 	return NULL;
 }
 
-bool CXmlOpeation::Parse_XML_File(char* pFileName, _Proc_Info& obj_Proc_Info)
+bool CXmlOpeation::Parse_XML_Class_File(char* pFileName, _Proc_Info& obj_Proc_Info)
 {
 	Close();
 	m_pTiXmlDocument = new TiXmlDocument(pFileName);
@@ -188,6 +188,12 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, _Proc_Info& obj_Proc_Info)
 			obj_Class_Info.m_nPollCount =atoi(pPoolCount);
 		}
 
+		char* pKey = (char* )pMainElement->Attribute("key");
+		if(NULL != pKey)
+		{
+			sprintf_safe(obj_Class_Info.m_szKey, MAX_BUFF_50, "%s", pKey);
+		}
+
 		//printf("Root=%s.\n", m_pRootElement->Value());
 		//遍历类内容
 		TiXmlNode* pNode = NULL;
@@ -208,6 +214,12 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, _Proc_Info& obj_Proc_Info)
 				{
 					objProperty.m_nLength = (int)atoi(pLength);
 				}
+
+				char* pInitValue = (char* )pNode->ToElement()->Attribute("Value");
+				if(NULL != pInitValue)
+				{
+					sprintf_safe(objProperty.m_szInitValue, MAX_BUFF_50, "%s", pInitValue);
+				}
 				
 				sprintf_safe(objProperty.m_szDesc, 100, "%s", pNode->ToElement()->Attribute("desc"));
 
@@ -224,7 +236,7 @@ bool CXmlOpeation::Parse_XML_File(char* pFileName, _Proc_Info& obj_Proc_Info)
 	return true;
 }
 
-bool CXmlOpeation::Parse_XML_define_File(char* pFileName, _Proc_Define_Info& obj_Proc_Define_Info)
+bool CXmlOpeation::Parse_XML_Define_File(char* pFileName, _Proc_Define_Info& obj_Proc_Define_Info)
 {
 	Close();
 	m_pTiXmlDocument = new TiXmlDocument(pFileName);
@@ -324,6 +336,7 @@ bool CXmlOpeation::Parse_XML_DB_File( char* pFileName, _DB_Proc& obj_DB_Proc )
 		TiXmlElement* pMainElement = pMainNode->ToElement();
 		sprintf_safe(obj_DB_Table.m_szTableName, MAX_BUFF_50, "%s", pMainElement->Attribute("name"));
 		sprintf_safe(obj_DB_Table.m_szClassName, MAX_BUFF_50, "%s", pMainElement->Attribute("class"));
+		sprintf_safe(obj_DB_Table.m_szDBFunc, MAX_BUFF_100, "%s", pMainElement->Attribute("Func"));
 
 		//循环遍历列内容
 		for(pColumnNode = pMainElement->FirstChildElement();pColumnNode;pColumnNode=pColumnNode->NextSiblingElement())

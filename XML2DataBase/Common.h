@@ -26,6 +26,7 @@ struct _Property
 	char          m_szPropertyName[MAX_BUFF_50];   //参数名称
 	char          m_szDesc[MAX_BUFF_100];          //描述信息  
 	char          m_szProperyType[MAX_BUFF_50];    //参数类型
+	char          m_szInitValue[MAX_BUFF_50];      //参数初值 
 	int           m_nLength;                       //长度 
 
 	_Property()
@@ -33,6 +34,7 @@ struct _Property
 		m_szPropertyName[0] = '\0';
 		m_szDesc[0]         = '\0';
 		m_szProperyType[0]  = '\0';
+		m_szInitValue[0]    = '\0';
 		m_nLength           = 0;
 	}
 };
@@ -45,12 +47,14 @@ struct _Class_Info
 	char m_szXMLName[60];
 	char m_szDesc[MAX_BUFF_100];
 	int  m_nPollCount;
+	char m_szKey[MAX_BUFF_50];
 	vecProperty m_vecProperty;
 
 	_Class_Info()
 	{
 		m_szXMLName[0] = '\0';
 		m_szDesc[0]    = '\0';
+		m_szKey[0]     = '\0';
 		m_nPollCount   = 0;
 	}
 };
@@ -128,12 +132,14 @@ struct _DB_Table
 {
 	char m_szTableName[MAX_BUFF_50];
 	char m_szClassName[MAX_BUFF_50];
+	char m_szDBFunc[MAX_BUFF_100];
 	vec_DB_Column m_vec_DB_Column;
 
 	_DB_Table()
 	{
 		m_szTableName[0] = '\0';
 		m_szClassName[0] = '\0';
+		m_szDBFunc[0]    = '\0';
 	}
 };
 typedef vector<_DB_Table> vec_DB_Table;
