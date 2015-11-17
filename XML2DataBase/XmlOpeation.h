@@ -25,9 +25,9 @@ public:
   char* GetData_Text(const char* pName);
   char* GetData_Text(const char* pName, TiXmlElement*& pNextTiXmlElement);
 
-  bool Parse_XML_Class_File(char* pFileName, _Proc_Info& obj_Proc_Info);
   bool Parse_XML_Define_File(char* pFileName, _Proc_Define_Info& obj_Proc_Define_Info);
-  bool Parse_XML_DB_File(char* pFileName, _DB_Proc& obj_DB_Proc);
+  bool Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XML_Proc);
+  bool Parse_XML_Table_Files(vec_Xml_File_Name obj_vec_Xml_File_Name, _XML_Proc& obj_XML_Proc);
 
   void Close();
 

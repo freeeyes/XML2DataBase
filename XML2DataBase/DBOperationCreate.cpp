@@ -1,302 +1,11 @@
 #include "DBOperationCreate.h"
 
-bool Create_Insert_SQL(_DB_Table& obj_DB_Table, char* pText)
-{
-	char szTemp[MAX_BUFF_500] = {'\0'};
-	char szTempValue[MAX_BUFF_500] = {'\0'};
 
-	//查找是否需要编写Insert
-	char* pFunc = NULL;
-	pFunc = strstr(obj_DB_Table.m_szDBFunc, "insert");
-	if(NULL == pFunc)
-	{
-		return false;
-	}
-
-	//拼接参数
-	for(int i = 0; i < (int)obj_DB_Table.m_vec_DB_Column.size(); i++)
-	{
-		if(i != (int)obj_DB_Table.m_vec_DB_Column.size() - 1)
-		{
-			sprintf_safe(szTemp, MAX_BUFF_500, "%s%s, ", szTemp, obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-		}
-		else
-		{
-			sprintf_safe(szTemp, MAX_BUFF_500, "%s%s", szTemp, obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-		}
-	}
-
-	//拼接结果
-	for(int i = 0; i < (int)obj_DB_Table.m_vec_DB_Column.size(); i++)
-	{
-		if(i != (int)obj_DB_Table.m_vec_DB_Column.size() - 1)
-		{
-			if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) > 0)
-			{
-				sprintf_safe(szTempValue, MAX_BUFF_500, "%sobj_%s.m_obj_%s, ", szTempValue, 
-					obj_DB_Table.m_szClassName,
-					obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-			}
-			else
-			{
-				sprintf_safe(szTempValue, MAX_BUFF_500, "%sobj_%s, ", szTempValue, 
-					obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-			}
-
-		}
-		else
-		{
-			if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) > 0)
-			{
-				sprintf_safe(szTempValue, MAX_BUFF_500, "%sobj_%s.m_obj_%s", szTempValue, 
-					obj_DB_Table.m_szClassName,
-					obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-			}
-			else
-			{
-				sprintf_safe(szTempValue, MAX_BUFF_500, "%sobj_%s", szTempValue, 
-					obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-			}
-		}
-	}
-
-	sprintf_safe(pText, MAX_BUFF_1024, "\t//INSERT %s(%s) VALUES(%s);\n", obj_DB_Table.m_szTableName, 
-		szTemp,
-		szTempValue);
-
-	return true;
-}
-
-bool Create_Update_SQL(_DB_Table& obj_DB_Table, char* pText)
-{
-	char szTemp[MAX_BUFF_500] = {'\0'};
-	char szTempSelect[MAX_BUFF_500] = {'\0'};
-
-	//查找是否需要编写Insert
-	char* pFunc = NULL;
-	pFunc = strstr(obj_DB_Table.m_szDBFunc, "update");
-	if(NULL == pFunc)
-	{
-		return false;
-	}
-
-	//拼接参数
-	int nPos = 0;
-	for(int i = 0; i < (int)obj_DB_Table.m_vec_DB_Column.size(); i++)
-	{
-		if(obj_DB_Table.m_vec_DB_Column[i].m_nIskey != 1)
-		{
-			if(nPos == 0)
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTemp, MAX_BUFF_500, "%s%s=obj_%s", szTemp, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTemp, MAX_BUFF_500, "%s%s=obj_%s.m_obj_%s", szTemp, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			else
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTemp, MAX_BUFF_500, "%s, %s=obj_%s", szTemp, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTemp, MAX_BUFF_500, "%s, %s=obj_%s.m_obj_%s", szTemp, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			nPos++;
-		}
-	}
-
-	//拼接条件
-	nPos = 0;
-	for(int i = 0; i < (int)obj_DB_Table.m_vec_DB_Column.size(); i++)
-	{
-		if(obj_DB_Table.m_vec_DB_Column[i].m_nIskey == 1)
-		{
-			if(nPos == 0)
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s%s=obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s%s=obj_%s.m_obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			else
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s AND %s=obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s AND %s=obj_%s.m_obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			nPos++;
-		}
-	}
-
-
-	sprintf_safe(pText, MAX_BUFF_1024, "\t//UPDATE %s SET %s WHERE %s;\n", obj_DB_Table.m_szTableName, 
-		szTemp,
-		szTempSelect);
-
-	return true;
-}
-
-bool Create_Delete_SQL(_DB_Table& obj_DB_Table, char* pText)
-{
-	char szTempSelect[MAX_BUFF_500] = {'\0'};
-
-	//查找是否需要编写Insert
-	char* pFunc = NULL;
-	pFunc = strstr(obj_DB_Table.m_szDBFunc, "delete");
-	if(NULL == pFunc)
-	{
-		return false;
-	}
-
-	//拼接条件
-	int nPos = 0;
-	for(int i = 0; i < (int)obj_DB_Table.m_vec_DB_Column.size(); i++)
-	{
-		if(obj_DB_Table.m_vec_DB_Column[i].m_nIskey == 1)
-		{
-			if(nPos == 0)
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s%s=obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s%s=obj_%s.m_obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			else
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s AND %s=obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s AND %s=obj_%s.m_obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			nPos++;
-		}
-	}
-
-	sprintf_safe(pText, MAX_BUFF_1024, "\t//DELETE FROM %s WHERE %s;\n", obj_DB_Table.m_szTableName, 
-		szTempSelect);
-
-	return true;
-}
-
-bool Create_Select_SQL(_DB_Table& obj_DB_Table, char* pText)
-{
-	char szTempSelect[MAX_BUFF_500] = {'\0'};
-
-	//查找是否需要编写Insert
-	char* pFunc = NULL;
-	pFunc = strstr(obj_DB_Table.m_szDBFunc, "select");
-	if(NULL == pFunc)
-	{
-		return false;
-	}
-
-	//拼接条件
-	int nPos = 0;
-	for(int i = 0; i < (int)obj_DB_Table.m_vec_DB_Column.size(); i++)
-	{
-		if(obj_DB_Table.m_vec_DB_Column[i].m_nIskey == 1)
-		{
-			if(nPos == 0)
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s%s=obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s%s=obj_%s.m_obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			else
-			{
-				if(strlen(obj_DB_Table.m_vec_DB_Column[i].m_szClassParam) == 0)
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s AND %s=obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName);
-				}
-				else
-				{
-					sprintf_safe(szTempSelect, MAX_BUFF_500, "%s AND %s=obj_%s.m_obj_%s", szTempSelect, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szDBName, 
-						obj_DB_Table.m_szClassName, 
-						obj_DB_Table.m_vec_DB_Column[i].m_szClassParam);
-				}
-			}
-			nPos++;
-		}
-	}
-
-	sprintf_safe(pText, MAX_BUFF_1024, "\t//SELECT * FROM %s WHERE %s;\n", obj_DB_Table.m_szTableName, 
-		szTempSelect);
-
-	return true;
-}
-
-void Create_DB_Environment(_DB_Proc& obj_DB_Proc)
+void Create_DB_Environment(_XML_Proc obj_XML_Proc)
 {
 	char szTempPath[MAX_BUFF_50]   = {'\0'};
 
-	sprintf_safe(szTempPath, MAX_BUFF_50, "%s", obj_DB_Proc.m_szProcName);
+	sprintf_safe(szTempPath, MAX_BUFF_50, "%s", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
 #else
@@ -304,7 +13,7 @@ void Create_DB_Environment(_DB_Proc& obj_DB_Proc)
 #endif
 
 	//创建LuaIncode目录
-	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBWrapper", obj_DB_Proc.m_szProcName);
+	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBWrapper", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
 #else
@@ -323,13 +32,13 @@ void Create_DB_Environment(_DB_Proc& obj_DB_Proc)
 	Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
 }
 
-bool Create_DB_H(_DB_Proc& obj_DB_Proc)
+bool Create_DB_H(_XML_Proc obj_XML_Proc)
 {
 	char szTemp[1024]     = {'\0'};
 	char szPathFile[200]  = {'\0'};
 
 	sprintf_safe(szPathFile, 200, "%s/DBWrapper/DB_Op.h", 
-		obj_DB_Proc.m_szProcName);
+		obj_XML_Proc.m_sz_ProcName);
 
 	FILE* pFile = fopen(szPathFile, "wb");
 	if(NULL == pFile)
@@ -346,109 +55,7 @@ bool Create_DB_H(_DB_Proc& obj_DB_Proc)
 	sprintf_safe(szTemp, 200, "#include \"mysql_encap.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	for(int i = 0; i < (int)obj_DB_Proc.m_vec_DB_Table.size(); i++)
-	{
-		//拼接参数
-		char szParam[MAX_BUFF_100] = {'\0'};
-		vec_DB_Column& obj_vec_DB_Column = obj_DB_Proc.m_vec_DB_Table[i].m_vec_DB_Column;
-		int nParamIndex = 0;
-		for(int j = 0; j < (int)obj_vec_DB_Column.size(); j++)
-		{
-			if(strlen(obj_vec_DB_Column[j].m_szClassParam) == 0)
-			{
-				//有外部参数，拼接之
-				sprintf_safe(szParam, MAX_BUFF_100, "%s%s obj_%s, ", szParam, 
-					obj_vec_DB_Column[j].m_szDBType, 
-					obj_vec_DB_Column[j].m_szDBName);
-				nParamIndex++;
-			}
-		}
-
-		//增删改查
-		char szTempSQL[MAX_BUFF_1024] = {'\0'};
-		if(nParamIndex > 0)
-		{
-			if(Create_Insert_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s);\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Update_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s);\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Delete_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Delete_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s);\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Select_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Select_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s);\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-		}
-		else
-		{
-			if(Create_Insert_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s obj_%s);\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Update_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s obj_%s);\n\n",
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Delete_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Delete_%s(MysqlEncap* pMysqlEncap, %s obj_%s);\n\n",
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Select_SQL(obj_DB_Proc.m_vec_DB_Table[i], szTempSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Select_%s(MysqlEncap* pMysqlEncap, %s obj_%s);\n\n",
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-		}
-
-	}
+	//需要添加代码
 
 	sprintf_safe(szTemp, 200, "#endif\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -456,14 +63,14 @@ bool Create_DB_H(_DB_Proc& obj_DB_Proc)
 	return true;
 }
 
-bool Create_DB_CPP(_DB_Proc& obj_DB_Proc)
+bool Create_DB_CPP(_XML_Proc obj_XML_Proc)
 {
 	char szTemp[1024]         = {'\0'};
 	char szPathFile[200]      = {'\0'};
 	char szSQL[MAX_BUFF_1024] = {'\0'};
 
 	sprintf_safe(szPathFile, 200, "%s/DBWrapper/DB_Op.cpp", 
-		obj_DB_Proc.m_szProcName);
+		obj_XML_Proc.m_sz_ProcName);
 
 	FILE* pFile = fopen(szPathFile, "wb");
 	if(NULL == pFile)
@@ -471,225 +78,20 @@ bool Create_DB_CPP(_DB_Proc& obj_DB_Proc)
 		return false;
 	}
 
-	sprintf_safe(szTemp, 200, "#include \"DB_Op.h\"\n\n");
+	sprintf_safe(szTemp, 200, "_XML_Proc obj_XML_Proc \"DB_Op.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	for(int i = 0; i < (int)obj_DB_Proc.m_vec_DB_Table.size(); i++)
-	{
-		//拼接参数
-		char szParam[MAX_BUFF_100] = {'\0'};
-		vec_DB_Column& obj_vec_DB_Column = obj_DB_Proc.m_vec_DB_Table[i].m_vec_DB_Column;
-		int nParamIndex = 0;
-		for(int j = 0; j < (int)obj_vec_DB_Column.size(); j++)
-		{
-			if(strlen(obj_vec_DB_Column[j].m_szClassParam) == 0)
-			{
-				//有外部参数，拼接之
-				sprintf_safe(szParam, MAX_BUFF_100, "%s%s obj_%s, ", szParam, 
-					obj_vec_DB_Column[j].m_szDBType, 
-					obj_vec_DB_Column[j].m_szDBName);
-				nParamIndex++;
-			}
-		}
-
-		if(nParamIndex > 0)
-		{
-			//增删改查
-			if(Create_Insert_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s)\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Update_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s)\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Delete_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Delete_%s(MysqlEncap* pMysqlEncap, %s%s obj_%s)\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Select_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Select_%s(MysqlEncap* pMysqlEncap, %s%s& obj_%s)\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					szParam, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-		}
-		else
-		{
-			//增删改查
-
-			if(Create_Insert_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Insert_%s(MysqlEncap* pMysqlEncap, %s obj_%s)\n", 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Update_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Update_%s(MysqlEncap* pMysqlEncap, %s obj_%s)\n",
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				Create_Update_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL);
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Delete_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Delete_%s(MysqlEncap* pMysqlEncap, %s obj_%s)\n",
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				Create_Update_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL);
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-
-			if(Create_Select_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL) == true)
-			{
-				sprintf_safe(szTemp, 200, "bool Select_%s(MysqlEncap* pMysqlEncap, %s& obj_%s)\n",
-					obj_DB_Proc.m_vec_DB_Table[i].m_szTableName, 
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName,
-					obj_DB_Proc.m_vec_DB_Table[i].m_szClassName);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//填充函数内容
-				sprintf_safe(szTemp, 200, "{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-				//拼接SQL语句
-				Create_Update_SQL(obj_DB_Proc.m_vec_DB_Table[i], szSQL);
-				fwrite(szSQL, strlen(szSQL), sizeof(char), pFile);
-
-				sprintf_safe(szTemp, 200, "\treturn true;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "}\n\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			}
-		}
-
-	}
+	//需要添加代码
 
 	fclose(pFile);
 	return true;
 }
 
-void Create_DB_Proc(_DB_Proc& obj_DB_Proc)
+void Create_DB_Proc(_XML_Proc obj_XML_Proc)
 {
-	Create_DB_Environment(obj_DB_Proc);
+	Create_DB_Environment(obj_XML_Proc);
 
-	Create_DB_H(obj_DB_Proc);
+	Create_DB_H(obj_XML_Proc);
 
-	Create_DB_CPP(obj_DB_Proc);
+	Create_DB_CPP(obj_XML_Proc);
 }

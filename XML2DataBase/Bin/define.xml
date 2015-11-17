@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- add by freeeyes -->
-<configer ProcName="DBTest">
+<configer ProcName="DBTest" DB="mysql">
 	<define srcType="unsigned char" tagType="uint8" desc="uint8" />
 	<define srcType="unsigned shout" tagType="uint16" desc="uint16" />
 	<define srcType="unsigned int" tagType="uint32" desc="uint32" />

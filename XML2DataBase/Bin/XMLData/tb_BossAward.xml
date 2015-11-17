@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<configer ProcName="DBTest" DB="mysql">
+	<TableClass database="db_test" table="tb_BossAward" class="CBossAward" classpool="" func="">
+		<Column name="bossid" dbtype="int" classtype="int" value="0" />
+		<Column name="bosslevel" dbtype="int" classtype="int" value="0" />
+		<Column name="awardid" dbtype="int" classtype="int" value="0" />
+	</TableClass>
+	
+	<TableExt database="db_test" table="tb_BossAward" class="CBossAward" >
+		<UnionKey value="bossid,bosslevel" />  <!-- 联合主键,表无联合主键是为空-->
+		<Index value="bossid" type="normal" /> <!-- 普通索引-->
+		<Index value="bosslevel" type="normal" />
+		<Sql value="select * from db_test.tb_BossAward where bossid = %d and bosslevel = %d;" funcname="selectfunc" returnvaule="CBossAward&" inputvalue="(int bossid,int bosslevel)"/>
+	</TableExt>	
+</configer>

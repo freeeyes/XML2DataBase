@@ -12,6 +12,7 @@
 #include <ctype.h>
 #include<iostream>
 #include<fstream>
+#include <string>
 
 using namespace std;
 
@@ -19,58 +20,6 @@ using namespace std;
 #define MAX_BUFF_100  100
 #define MAX_BUFF_500  500
 #define MAX_BUFF_1024 1024
-
-//属性信息
-struct _Property
-{
-	char          m_szPropertyName[MAX_BUFF_50];   //参数名称
-	char          m_szDesc[MAX_BUFF_100];          //描述信息  
-	char          m_szProperyType[MAX_BUFF_50];    //参数类型
-	char          m_szInitValue[MAX_BUFF_50];      //参数初值 
-	int           m_nLength;                       //长度 
-
-	_Property()
-	{
-		m_szPropertyName[0] = '\0';
-		m_szDesc[0]         = '\0';
-		m_szProperyType[0]  = '\0';
-		m_szInitValue[0]    = '\0';
-		m_nLength           = 0;
-	}
-};
-
-typedef vector<_Property> vecProperty;
-
-//类信息
-struct _Class_Info
-{
-	char m_szXMLName[60];
-	char m_szDesc[MAX_BUFF_100];
-	int  m_nPollCount;
-	char m_szKey[MAX_BUFF_50];
-	vecProperty m_vecProperty;
-
-	_Class_Info()
-	{
-		m_szXMLName[0] = '\0';
-		m_szDesc[0]    = '\0';
-		m_szKey[0]     = '\0';
-		m_nPollCount   = 0;
-	}
-};
-typedef vector<_Class_Info> vec_Class_Info;
-
-//工程名称
-struct _Proc_Info
-{
-	char m_szProcName[MAX_BUFF_50];
-	vec_Class_Info obj_vec_Class_Info;
-
-	_Proc_Info()
-	{
-		m_szProcName[0] = '\0';
-	}
-};
 
 //预定义信息
 struct _Define_Info
@@ -91,11 +40,13 @@ typedef vector<_Define_Info> vec_Define_Info;
 struct _Proc_Define_Info
 {
 	char m_szProcName[MAX_BUFF_50];
+	char m_szDBType[MAX_BUFF_50];
 	vec_Define_Info obj_vec_Define_Info;
 
 	_Proc_Define_Info()
 	{
 		m_szProcName[0] = '\0';
+		m_szDBType[0]   = '\0';
 	}
 };
 
@@ -110,52 +61,122 @@ struct _Include_Info
 };
 typedef vector<_Include_Info> vec_Include_Info;
 
-//数据库操作相关
-struct _DB_Column
-{
-	char m_szDBName[MAX_BUFF_50];
-	char m_szDBType[MAX_BUFF_50];
-	char m_szClassParam[MAX_BUFF_50];
-	int  m_nIskey;
 
-	_DB_Column()
+//**************************************************
+//新版数据结构
+typedef vector<string> vec_Xml_File_Name;
+
+struct _Column_Info
+{
+	char m_sz_Column_Name[MAX_BUFF_50];
+	char m_sz_Db_Type[MAX_BUFF_50];
+	char m_sz_Class_Type[MAX_BUFF_50];
+	char m_sz_Desc[MAX_BUFF_100];   
+	char m_sz_Init_Value[MAX_BUFF_50];
+	int  m_n_Length;
+
+	_Column_Info()
 	{
-		m_nIskey          = 0;
-		m_szDBName[0]     = '\0';
-		m_szDBType[0]     = '\0';
-		m_szClassParam[0] = '\0';
+		m_sz_Column_Name[0]  = '\0';
+		m_sz_Db_Type[0]      = '\0';
+		m_sz_Class_Type[0]   = '\0';
+		m_sz_Desc[0]         = '\0';
+		m_sz_Init_Value[0]   = '\0';
+		m_n_Length           = 0;
 	}
 };
-typedef vector<_DB_Column> vec_DB_Column;
+typedef vector<_Column_Info> vec_Column_Info;
 
-struct _DB_Table
+struct _Table_Info
 {
-	char m_szTableName[MAX_BUFF_50];
-	char m_szClassName[MAX_BUFF_50];
-	char m_szDBFunc[MAX_BUFF_100];
-	vec_DB_Column m_vec_DB_Column;
+	char m_sz_Table_Name[MAX_BUFF_50];
+	char m_sz_Db_Name[MAX_BUFF_50];
+	char m_sz_Class_Name[MAX_BUFF_50];
+	char m_sz_Func[MAX_BUFF_50];
+	char m_sz_SerialType[MAX_BUFF_50];
+	char m_sz_Desc[MAX_BUFF_100];
+	char m_sz_key[MAX_BUFF_50];
+	int  m_n_Class_Pool;
+	vec_Column_Info m_obj_vec_Column_Info;
 
-	_DB_Table()
+	_Table_Info()
 	{
-		m_szTableName[0] = '\0';
-		m_szClassName[0] = '\0';
-		m_szDBFunc[0]    = '\0';
+		m_sz_Table_Name[0]  = '\0';
+		m_sz_Db_Name[0]     = '\0';
+		m_sz_Class_Name[0]  = '\0';
+		m_sz_Func[0]        = '\0';
+		m_sz_SerialType[0]  = '\0';
+		m_sz_Desc[0]        = '\0';
+		m_sz_key[0]         = '\0';
+		m_n_Class_Pool      = 0;
 	}
 };
-typedef vector<_DB_Table> vec_DB_Table;
+typedef vector<_Table_Info> vec_Table_Info;
 
-struct _DB_Proc
+struct _Table_Ext_Index
 {
-	char m_szProcName[MAX_BUFF_50];
-	char m_szDBType[MAX_BUFF_50];
-	vec_DB_Table m_vec_DB_Table;
+	char m_sz_Value[MAX_BUFF_50];
+	char m_sz_Type[MAX_BUFF_50];
 
-	_DB_Proc()
+	_Table_Ext_Index()
 	{
-		m_szProcName[0] = '\0';
-		m_szDBType[0]   = '\0';
+		m_sz_Value[0]    = '\0';
+		m_sz_Type[0]     = '\0';
 	}
 };
+typedef vector<_Table_Ext_Index> vec_Table_Ext_Index;
+
+struct _Table_Ext_SQL
+{
+	char m_sz_Sql_Text[MAX_BUFF_100];
+	char m_sz_Func_Name[MAX_BUFF_50];
+	char m_sz_Return_Value[MAX_BUFF_100];
+	char m_sz_Input_Value[MAX_BUFF_100];
+
+	_Table_Ext_SQL()
+	{
+		m_sz_Sql_Text[0]     = '\0';
+		m_sz_Func_Name[0]    = '\0';
+		m_sz_Return_Value[0] = '\0';
+		m_sz_Input_Value[0]  = '\0';
+	}
+};
+typedef vector<_Table_Ext_SQL> vec_Table_Ext_SQL;
+
+struct _Table_Ext
+{
+	char m_sz_Table_Name[MAX_BUFF_50];
+	char m_sz_Db_Name[MAX_BUFF_50];
+	char m_sz_Class_Name[MAX_BUFF_50];
+	char m_sz_UnionKey[MAX_BUFF_50];
+	vec_Table_Ext_Index m_obj_vec_Table_Ext_Index;
+	vec_Table_Ext_SQL m_obj_vec_Table_Ext_SQL;
+
+	_Table_Ext()
+	{
+		m_sz_Table_Name[0]    = '\0';
+		m_sz_Db_Name[0]       = '\0';
+		m_sz_Class_Name[0]    = '\0';
+		m_sz_UnionKey[0]      = '\0';
+	}
+};
+typedef vector<_Table_Ext> vec_Table_Ext;
+
+struct _XML_Proc
+{
+	char              m_sz_ProcName[MAX_BUFF_50];
+	char              m_sz_DBType[MAX_BUFF_50];
+	vec_Table_Info    m_obj_vec_Table_Info;
+	vec_Table_Ext     m_obj_vec_Table_Ext;
+
+	_XML_Proc()
+	{
+		m_sz_ProcName[0] = '\0';
+		m_sz_DBType[0]   = '\0';
+	}
+};
+
+//**************************************************
 
 static void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {

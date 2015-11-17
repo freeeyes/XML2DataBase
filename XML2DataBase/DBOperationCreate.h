@@ -9,20 +9,12 @@
 #endif
 using namespace std;
 
-bool Create_Insert_SQL(_DB_Table& obj_DB_Table, char* pText);
+void Create_DB_Environment(_XML_Proc obj_XML_Proc);
 
-bool Create_Update_SQL(_DB_Table& obj_DB_Table, char* pText);
+bool Create_DB_H(_XML_Proc obj_XML_Proc);
 
-bool Create_Delete_SQL(_DB_Table& obj_DB_Table, char* pText);
+bool Create_DB_CPP(_XML_Proc obj_XML_Proc);
 
-bool Create_Select_SQL(_DB_Table& obj_DB_Table, char* pText);
-
-void Create_DB_Environment(_DB_Proc& obj_DB_Proc);
-
-bool Create_DB_H(_DB_Proc& obj_DB_Proc);
-
-bool Create_DB_CPP(_DB_Proc& obj_DB_Proc);
-
-void Create_DB_Proc(_DB_Proc& obj_DB_Proc);
+void Create_DB_Proc(_XML_Proc obj_XML_Proc);
 
 #endif
