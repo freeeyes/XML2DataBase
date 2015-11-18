@@ -3,6 +3,6 @@
 <!-- add by freeeyes -->
 <configer ProcName="DBTest" DB="mysql">
 	<define srcType="unsigned char" tagType="uint8" desc="uint8" />
-	<define srcType="unsigned shout" tagType="uint16" desc="uint16" />
+	<define srcType="unsigned short" tagType="uint16" desc="uint16" />
 	<define srcType="unsigned int" tagType="uint32" desc="uint32" />
 </configer>

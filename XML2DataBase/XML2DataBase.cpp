@@ -23,12 +23,12 @@ bool Read_Xml_Folder( string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Nam
 	string strfind = folderPath + "\\*";
 	long Handle = _findfirst(strfind.c_str(), &FileInfo);
 
-
 	if (Handle == -1L)
 	{
 		return false;
 	}
-	do{
+	do
+	{
 		//判断是否有子目录
 		if (FileInfo.attrib & _A_SUBDIR)    
 		{
@@ -45,28 +45,26 @@ bool Read_Xml_Folder( string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Nam
 			string filename = folderPath + "\\" + FileInfo.name;
 			obj_vec_Xml_File_Name.push_back(filename);
 		}
-	}while (_findnext(Handle, &FileInfo) == 0);
-
+	} while (_findnext(Handle, &FileInfo) == 0);
 
 	_findclose(Handle);
 #else
 	DIR *dp;
 	struct dirent *entry;
 	struct stat statbuf;
-	if((dp = opendir(folderPath.c_str())) == NULL) {
+	if((dp = opendir(folderPath.c_str())) == NULL) 
+	{
 		printf(stderr,"cannot open directory: %s\n", folderPath.c_str());
 		return;
 	}
 	chdir(folderPath.c_str());
-	while((entry = readdir(dp)) != NULL) {
+	while((entry = readdir(dp)) != NULL) 
+	{
 		lstat(entry->d_name,&statbuf);
-		if(S_ISDIR(statbuf.st_mode)) {
-
-
-			if(strcmp(".",entry->d_name) == 0 ||
-				strcmp("..",entry->d_name) == 0)
+		if(S_ISDIR(statbuf.st_mode)) 
+		{
+			if(strcmp(".",entry->d_name) == 0 || strcmp("..",entry->d_name) == 0)
 				continue;
-
 			//不需要支持子目录遍历
 			//printf("%*s%s/\n",depth,"",entry->d_name);
 			//dfsFolder(entry->d_name,depth+4);
@@ -106,6 +104,7 @@ int main(int argc, char* argv[])
 	obj_XmlOpeation.Parse_XML_Table_Files(obj_vec_Xml_File_Name, obj_XML_Proc);
 
 	Create_Proc(obj_Proc_Define_Info, obj_XML_Proc);
+	Create_DB_Proc(obj_XML_Proc);
 
 	//废弃代码
 	//_Proc_Info        obj_Proc_Info;
@@ -124,7 +123,7 @@ int main(int argc, char* argv[])
 	//Create_Proc(obj_Proc_Define_Info, obj_Proc_Info);
 
 	//Create_DB_Proc(obj_DB_Proc);
-
+	getchar();
 	return 0;
 }
 

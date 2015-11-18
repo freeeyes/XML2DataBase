@@ -235,8 +235,12 @@ bool CXmlOpeation::Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XM
 		if(strcmp("TableClass", sz_NodeName) == 0)
 		{
 			_Table_Info obj_Table_Info;
-			//如果是TableClass
-			sprintf_safe(obj_Table_Info.m_sz_Db_Name, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("database"));
+			
+			if(NULL != pMainNode->ToElement()->Attribute("database"))
+			{
+				//如果是TableClass
+				sprintf_safe(obj_Table_Info.m_sz_Db_Name, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("database"));
+			}
 			if(NULL != pMainNode->ToElement()->Attribute("table"))
 			{
 				sprintf_safe(obj_Table_Info.m_sz_Table_Name, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("table"));
@@ -333,7 +337,7 @@ bool CXmlOpeation::Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XM
 					_Table_Ext_SQL obj_Table_Ext_SQL;
 					sprintf_safe(obj_Table_Ext_SQL.m_sz_Sql_Text, MAX_BUFF_100, "%s", pColumnNode->ToElement()->Attribute("value"));
 					sprintf_safe(obj_Table_Ext_SQL.m_sz_Func_Name, MAX_BUFF_50, "%s", pColumnNode->ToElement()->Attribute("funcname"));
-					sprintf_safe(obj_Table_Ext_SQL.m_sz_Return_Value, MAX_BUFF_100, "%s", pColumnNode->ToElement()->Attribute("returnvaule"));
+					obj_Table_Ext_SQL.m_n_Select_Type = atoi(pColumnNode->ToElement()->Attribute("selecttype"));
 					sprintf_safe(obj_Table_Ext_SQL.m_sz_Input_Value, MAX_BUFF_100, "%s", pColumnNode->ToElement()->Attribute("inputvalue"));
 					obj_Table_Ext.m_obj_vec_Table_Ext_SQL.push_back(obj_Table_Ext_SQL);
 				}

@@ -1,6 +1,6 @@
 #include "ClassCreate.h"
 
-void Check_Include_File(_Table_Info obj_Class_Info, _XML_Proc obj_XML_Proc, vec_Include_Info& obj_vec_Include_Info)
+void Check_Include_File(_Table_Info& obj_Class_Info, _XML_Proc& obj_XML_Proc, vec_Include_Info& obj_vec_Include_Info)
 {
 	obj_vec_Include_Info.clear();
 
@@ -55,7 +55,7 @@ void Create_Environment(_XML_Proc& obj_XML_Proc)
 #endif
 }
 
-void Create_Define_H(_Proc_Define_Info obj_Proc_Define_Info)
+void Create_Define_H(_Proc_Define_Info& obj_Proc_Define_Info)
 {
 	char szTemp[1024]     = {'\0'};
 	char szPathFile[200]  = {'\0'};
@@ -71,9 +71,9 @@ void Create_Define_H(_Proc_Define_Info obj_Proc_Define_Info)
 	}
 
 	//编写文件说明
-	sprintf_safe(szTemp, 200, "#ifndef _COMMON_DEFINE_H\n");
+	sprintf_safe(szTemp, 200, "#ifndef _COMMON_DEFINE_H_\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "#define _COMMON_DEFINE_H\n\n");
+	sprintf_safe(szTemp, 200, "#define _COMMON_DEFINE_H_\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	sprintf_safe(szTemp, 200, "#include <stdio.h>\n\n");
@@ -235,20 +235,19 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			}
 			else
 			{
-				sprintf_safe(szTemp, 200, "\t\tfor(int i = 0; i < %d; i++)", obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
+				sprintf_safe(szTemp, 200, "\t\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t{");
+				sprintf_safe(szTemp, 200, "\t\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\t\tthis->m_obj_%s[i] = ar.m_obj_%s[i];\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t}");
+				sprintf_safe(szTemp, 200, "\t\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
-
 		}
-		sprintf_safe(szTemp, 200, "\t};\n\n");
+		sprintf_safe(szTemp, 200, "\t}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		sprintf_safe(szTemp, 200, "private:\n");
@@ -462,7 +461,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				}
 			}
 		}
-		sprintf_safe(szTemp, 200, "}\n", 
+		sprintf_safe(szTemp, 200, "}\n\n", 
 			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -823,7 +822,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 	return true;
 }
 
-void Create_Proc(_Proc_Define_Info obj_Proc_Define_Info, _XML_Proc obj_XML_Proc)
+void Create_Proc(_Proc_Define_Info& obj_Proc_Define_Info, _XML_Proc& obj_XML_Proc)
 {
 	Create_Environment(obj_XML_Proc);
 

@@ -132,7 +132,7 @@ bool MysqlEncap::ExecuteQuery(const char* sql, vector < map<string, string> >& v
             }
             else
             {
-                return 0;
+                return true;
             }
         }
 
