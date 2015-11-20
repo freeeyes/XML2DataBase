@@ -3,13 +3,19 @@
 
 #include "Common.h"
 #ifdef WIN32
+#include <io.h>
 #include <direct.h>
 #else
-#include <sys/stat.h> 
+#include <unistd.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
 #endif
 #include<iostream>
 #include<fstream>
 using namespace std;
+
+void Copy_Json_File(string folderPath);
 
 void Check_Include_File(_Table_Info& obj_Class_Info, _XML_Proc& obj_XML_Proc, vec_Include_Info& obj_vec_Include_Info);
 

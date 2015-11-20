@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
 	//Create_Proc(obj_Proc_Define_Info, obj_Proc_Info);
 
 	//Create_DB_Proc(obj_DB_Proc);
-	getchar();
+	//getchar();
 	return 0;
 }
 
