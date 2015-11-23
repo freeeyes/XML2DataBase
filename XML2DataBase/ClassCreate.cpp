@@ -707,12 +707,81 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				//循环写入Json中的变量
 				for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
 				{
-					if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0)
+					if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0
+						&& obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0
+						&& strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
 					{
+						//单一数据
 						sprintf_safe(szTemp, 200, "\tobject.AddMember(\"%s\", m_obj_%s, allocator);\n", 
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0
+						&& obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length > 0
+						&& strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") != 0)
+					{
+						//数组数据,判断是否是当前已有的数据类型
+						bool blFlag = false;
+						for(int k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); k++)
+						{
+							if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[k].m_sz_Class_Name, 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name) == 0)
+							{
+								blFlag = true;
+								break;
+							}
+						}
+
+						if(true == blFlag)
+						{
+							//当前声明类对象，调用Json序列化方法
+							sprintf_safe(szTemp, 200, "\trapidjson::Value array(rapidjson::kArrayType);\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//obj.AddMember("age", 23, allocator)
+							sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d,; i++)\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\tstring strobjJson;\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\tm_obj_%s[i].Serialization(strobjJson)\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\tarray.PushBack(strobjJson.c_str(), allocator);\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t}\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\td.AddMember(\"array_%s\", array, allocator);\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else
+						{
+							//基础类型
+							sprintf_safe(szTemp, 200, "\trapidjson::Value array(rapidjson::kArrayType);\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//obj.AddMember("age", 23, allocator)
+							sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d,; i++)\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\trapidjson::Value obj(rapidjson::kObjectType);\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\tobj.AddMember(\"%s\", m_obj_%s[i], allocator)\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\tarray.PushBack(obj, allocator);\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t}\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\td.AddMember(\"array_%s\", array, allocator);\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
 					}
 				}
 				sprintf_safe(szTemp, 200, "\tStringBuffer buffer;\n");
@@ -751,7 +820,9 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				//循环读取Json中的变量
 				for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
 				{
-					if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0)
+					if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0
+						&& obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0
+						&& strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
 					{
 						sprintf_safe(szTemp, 200, "\t\tif(d.HasMember(\"%s\"))\n", 
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
@@ -775,6 +846,84 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 
 						sprintf_safe(szTemp, 200, "\t\t}\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0
+						&& obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length > 0
+						&& strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") != 0)
+					{
+						//数组数据,判断是否是当前已有的数据类型
+						bool blFlag = false;
+						for(int k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); k++)
+						{
+							if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[k].m_sz_Class_Name, 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name) == 0)
+							{
+								blFlag = true;
+								break;
+							}
+						}
+
+						if(true == blFlag)
+						{
+							//当前声明类对象，调用Json序列化方法
+							sprintf_safe(szTemp, 200, "\t\tif(d.HasMember(\"array_%s\"))\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\tfor(int i = 0; i < d[\"array_%s\"].Size(); i++)\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t\tchar szJson[2048] = {'\\0'};\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t\tsprintf(szJson, \"%%s\", d[\"array_%s\"][i].GetString());\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t\tstring strJson = (string)szJson;\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s[i].UnSerialization(strJson);\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t}\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t}\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else
+						{
+							//基础类型
+							sprintf_safe(szTemp, 200, "\t\tif(d.HasMember(\"array_%s\"))\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\tfor(int i = 0; i < d[\"array_%s\"].Size(); i++)\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "int") == 0)
+							{
+								sprintf_safe(szTemp, 200, "\t\t\t\tsprintf(szJson, \"%%s\", d[\"array_%s\"][i].GetInt()\");\n",
+									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							}
+							else
+							{
+								sprintf_safe(szTemp, 200, "\t\t\t\tsprintf(szJson, \"%%s\", d[\"array_%s\"][i].GetString()\");\n",
+									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							}
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t\t}\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							sprintf_safe(szTemp, 200, "\t\t}\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+
 					}
 					
 				}
