@@ -729,10 +729,28 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					&& obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
 				{
 					//单一数据
-					sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "int") == 0)
+					{
+						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else
+					{
+						sprintf_safe(szTemp, 200, "\trapidjson::Value value_%s;\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						sprintf_safe(szTemp, 200, "\tvalue_%s.SetString(m_obj_GridDesc, strlen(m_obj_%s), allocator);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", value_%s, allocator);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+
 				}
 				else if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0
 					&& obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length > 0
@@ -802,11 +820,28 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				}
 				else
 				{
-					//单一数据
-					sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					//字符数组
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "int") == 0)
+					{
+						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else
+					{
+						sprintf_safe(szTemp, 200, "\trapidjson::Value value_%s;\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						sprintf_safe(szTemp, 200, "\tvalue_%s.SetString(m_obj_GridDesc, strlen(m_obj_%s), allocator);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", value_%s, allocator);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
 				}
 			}
 			sprintf_safe(szTemp, 200, "\tStringBuffer buffer;\n");
@@ -856,7 +891,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "int") == 0)
 					{
-						sprintf_safe(szTemp, 200, "\t\t\tm_obj_%s = d[\"%s\"].GetInt());\n",
+						sprintf_safe(szTemp, 200, "\t\t\tm_obj_%s = d[\"%s\"].GetInt();\n",
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

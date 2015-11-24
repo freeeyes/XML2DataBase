@@ -8,7 +8,7 @@
 		<!-- 格子中的物品类型，如果没有则是0 -->
 		<Column name="GridType" dbtype="int" classtype="int" value="0" />
 		<!-- 格子中的物品描述，如果没有默认值是空 -->
-		<Column name="GridDesc" dbtype="int" classtype="char" length="50" value="'\0'" />
+		<Column name="GridDesc" dbtype="char" classtype="char" length="50" value="'\0'" />
 		<!-- 格子中的物品个数，如果没有默认值是0 -->
 		<Column name="GridCount" dbtype="int" classtype="int" value="" />
 	</TableClass>  
