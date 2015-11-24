@@ -75,17 +75,17 @@ void Create_DB_Environment(_XML_Proc& obj_XML_Proc)
 #endif
 
 	//拷贝指定文件到目录中去
-	char szTempFile[MAX_BUFF_100] = {'\0'};
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
-	Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
-	Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
-	Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
-	Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
-	Tranfile("../MysqlCommon/lock.h", szTempFile);
+	//char szTempFile[MAX_BUFF_100] = {'\0'};
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
+	//Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
+	//Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
+	//Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
+	//Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
+	//Tranfile("../MysqlCommon/lock.h", szTempFile);
 }
 
 bool Create_DB_H(_XML_Proc& obj_XML_Proc)
@@ -205,7 +205,11 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 		return false;
 	}
 
-	sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n\n");
+	sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, sizeof(szTemp), "#include <iostream>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, sizeof(szTemp), "using namespace std;\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	//需要添加代码
@@ -315,38 +319,72 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 				if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
 				{
-					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
 					{
-						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(atoi(vmResultData[0][\"%s\"].c_str()));\n", 
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s objjson;\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.UnSerialization(vmResultData[0][\"%s\"]);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 					else
 					{
-						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(vmResultData[0][\"%s\"].c_str());\n", 
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+						{
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(atoi((char*)vmResultData[0][\"%s\"].c_str()));\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else
+						{
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
 					}
 				}
 				else
 				{
-					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
 					{
-						//如果是字符串，特殊处理
-						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(vmResultData[0][\"%s\"].c_str());\n", 
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s objjson;\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.UnSerialization(vmResultData[0][\"%s\"]);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 					else
 					{
-						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(vmResultData[0][\"%s\"].c_str());\n", 
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					}
+						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+						{
+							//如果是字符串，特殊处理
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else
+						{
+						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+					}					
 				}
 			}
 
@@ -427,7 +465,14 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						strValue = strValue + "(%d, ";
 					}
 
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
+					}
+					else
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					}
 				}
 				else if (j == (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size() -1 )
 				{
@@ -441,7 +486,14 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						strValue = strValue + "%d);";
 					}
 
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str()";
+					}
+					else
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
+					}
 				}
 				else
 				{
@@ -455,7 +507,14 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						strValue = strValue + "%d, ";
 					}
 
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
+					}
+					else
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					}
 				}
 			}
 
@@ -587,7 +646,14 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 					continue;
 				}
 
-				strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+				{
+					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
+				}
+				else
+				{
+					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+				}
 			}
 
 			for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
@@ -596,8 +662,15 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				{
 					continue;
 				}
-				
-				strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "();";
+
+				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+				{
+					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str();";
+				}
+				else
+				{
+					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "();";
+				}
 			}
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tsnprintf(szSql, sizeof(szSql), \"%s\", %s);\n", 
@@ -728,12 +801,14 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 	{
 		for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL.size(); j++)
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool %s(%s);\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool %s(%s)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL[j].m_sz_Func_Name,
 				obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL[j].m_sz_Input_Value);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[1024] = {0};\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tMysqlEncap* pme = ConnPool::GetInstance()->GetOneConn();\n");
@@ -795,7 +870,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, sizeof(szTemp), "\t%s.clear();\n",strReturnValue.c_str());
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, sizeof(szTemp), "\tvector<map<string, string>> vmResultData;\n");
+				sprintf_safe(szTemp, sizeof(szTemp), "\tvector< map<string, string> > vmResultData;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 				sprintf_safe(szTemp, sizeof(szTemp), "\tsnprintf(szSql, sizeof(szSql), \"%s\", %s);\n", obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL[j].m_sz_Sql_Text,

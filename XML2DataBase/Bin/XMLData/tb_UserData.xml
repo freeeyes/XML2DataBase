@@ -15,7 +15,7 @@
   
  	<TableClass database="db_test" class="CUserGridList" SerialType="json" desc="">
 		<!-- GridID 一般与之匹配的是UserID 默认是0-->
-		<Column name="GridID" classtype="int" value="" />
+		<Column name="GridID" dbtype="int" classtype="int" value="" />
 		<!-- 一个List对象，最多有20个格子 -->
 		<Column name="CUserGrid" classtype="CUserGrid" length="20" />
 	</TableClass> 
