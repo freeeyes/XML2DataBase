@@ -467,7 +467,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().Serialization().c_str(), ";
 					}
 					else
 					{
@@ -488,7 +488,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str()";
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().Serialization().c_str()";
 					}
 					else
 					{
@@ -509,7 +509,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().Serialization().c_str(), ";
 					}
 					else
 					{
@@ -648,7 +648,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
 				{
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
+					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().Serialization().c_str(), ";
 				}
 				else
 				{
@@ -665,11 +665,11 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
 				{
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str();";
+					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().Serialization().c_str()";
 				}
 				else
 				{
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "();";
+					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
 				}
 			}
 

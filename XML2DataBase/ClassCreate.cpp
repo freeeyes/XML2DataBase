@@ -731,10 +731,10 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					//单一数据
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "int") == 0)
 					{
-						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 					else
 					{
@@ -750,7 +750,6 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
-
 				}
 				else if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0
 					&& obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length > 0
@@ -779,13 +778,18 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t{\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-						sprintf_safe(szTemp, 200, "\t\tstring str_obj_Json;\n");
+
+						sprintf_safe(szTemp, 200, "\t\trapidjson::Value value_str;\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-						sprintf_safe(szTemp, 200, "\t\tm_obj_%s[i].Serialization(str_obj_Json);\n",
+
+						sprintf_safe(szTemp, 200, "\t\tvalue_str.SetString(m_obj_%s[i].Serialization().c_str(),m_obj_%s[i].Serialization().size(), allocator);\n",
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-						sprintf_safe(szTemp, 200, "\t\tarray.PushBack(str_obj_Json.c_str(), allocator);\n");
+
+						sprintf_safe(szTemp, 200, "\t\tarray.PushBack(value_str, allocator);\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 						sprintf_safe(szTemp, 200, "\t}\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\td.AddMember(\"array_%s\", array, allocator);\n",
@@ -803,6 +807,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t{\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 						sprintf_safe(szTemp, 200, "\t\trapidjson::Value obj(rapidjson::kObjectType);\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t\tobj.AddMember(\"%s\", m_obj_%s[i], allocator)\n",
@@ -811,6 +816,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t\tarray.PushBack(obj, allocator);\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						
 						sprintf_safe(szTemp, 200, "\t}\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\td.AddMember(\"array_%s\", array, allocator);\n",
@@ -820,13 +826,13 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				}
 				else
 				{
-					//字符数组
+					//单一数据
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "int") == 0)
 					{
-						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", m_obj_%s, allocator);\n", 
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 					else
 					{
