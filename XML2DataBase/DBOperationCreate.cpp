@@ -66,7 +66,7 @@ void Create_DB_Environment(_XML_Proc& obj_XML_Proc)
 	mkdir(szTempPath, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
 #endif
 
-	//创建LuaIncode目录
+	//创建DBWrapper目录
 	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBWrapper", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
@@ -75,17 +75,25 @@ void Create_DB_Environment(_XML_Proc& obj_XML_Proc)
 #endif
 
 	//拷贝指定文件到目录中去
-	//char szTempFile[MAX_BUFF_100] = {'\0'};
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
-	//Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
-	//Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
-	//Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
-	//Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
-	//Tranfile("../MysqlCommon/lock.h", szTempFile);
+	char szTempFile[MAX_BUFF_100] = {'\0'};
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
+	Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
+	Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
+	Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
+	Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
+	Tranfile("../MysqlCommon/lock.h", szTempFile);
+
+	//创建SQL脚本生成目录
+	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBScript", obj_XML_Proc.m_sz_ProcName);
+#ifdef WIN32
+	_mkdir(szTempPath);
+#else
+	mkdir(szTempPath, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
+#endif
 }
 
 bool Create_DB_H(_XML_Proc& obj_XML_Proc)
@@ -1027,6 +1035,59 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 	return true;
 }
 
+bool Create_DB_Script(_XML_Proc& obj_XML_Proc)
+{
+	//创建SQL表创建脚本语句
+	char szTemp[1024]         = {'\0'};
+	char szPathFile[200]      = {'\0'};
+	char szSQL[MAX_BUFF_1024] = {'\0'};
+
+	sprintf_safe(szPathFile, 200, "%s/DBScript/SQL_Script.sql", 
+		obj_XML_Proc.m_sz_ProcName);
+
+	FILE* pFile = fopen(szPathFile, "wb");
+	if(NULL == pFile)
+	{
+		return false;
+	}
+
+	for(int i = 0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_SerialType, "") == 0)
+		{
+			//如果是需要生成数据库表的
+			sprintf_safe(szTemp, sizeof(szTemp), "CREATE TABLE %s(\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Db_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
+			{
+				if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type) > 0)
+				{
+					if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
+					{
+						sprintf_safe(szTemp, sizeof(szTemp), "%s %s,\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else
+					{
+						sprintf_safe(szTemp, sizeof(szTemp), "%s %s(%d),\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+				}
+			}
+			sprintf_safe(szTemp, sizeof(szTemp), ");\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+	}
+
+	fclose(pFile);
+	return true;
+}
+
 void Create_DB_Proc(_XML_Proc& obj_XML_Proc)
 {
 	Create_DB_Environment(obj_XML_Proc);
@@ -1034,4 +1095,6 @@ void Create_DB_Proc(_XML_Proc& obj_XML_Proc)
 	Create_DB_H(obj_XML_Proc);
 
 	Create_DB_CPP(obj_XML_Proc);
+
+	Create_DB_Script(obj_XML_Proc);
 }
