@@ -265,6 +265,10 @@ bool CXmlOpeation::Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XM
 			{
 				sprintf_safe(obj_Table_Info.m_sz_key, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("key"));
 			}
+			if(NULL != pMainNode->ToElement()->Attribute("shmkey"))
+			{
+				sprintf_safe(obj_Table_Info.m_sz_ShmKey, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("shmkey"));
+			}
 			if(NULL != pMainNode->ToElement()->Attribute("desc"))
 			{
 				sprintf_safe(obj_Table_Info.m_sz_Desc, MAX_BUFF_100, "%s", pMainNode->ToElement()->Attribute("desc"));

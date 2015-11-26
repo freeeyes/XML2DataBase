@@ -76,6 +76,82 @@ void Copy_Json_File(string folderPath, string newfolderPath)
 #endif
 }
 
+void Copy_ShareMemory_File(string folderPath, string newfolderPath)
+{
+#ifdef WIN32
+	_finddata_t FileInfo;
+	string strfind = folderPath + "\\*";
+	long Handle = _findfirst(strfind.c_str(), &FileInfo);
+
+	if (Handle == -1L)
+	{
+		return;
+	}
+	do
+	{
+		//判断是否有子目录
+		if (FileInfo.attrib & _A_SUBDIR)    
+		{
+			//这个语句很重要
+			if( (strcmp(FileInfo.name,".") != 0 ) &&(strcmp(FileInfo.name,"..") != 0))   
+			{
+				string newPath     = folderPath + "\\" + FileInfo.name;
+				string newjosnPath = newfolderPath + "\\" + FileInfo.name;
+
+				//创建新的映射目录
+#ifdef WIN32
+				_mkdir(newjosnPath.c_str());
+#else
+				mkdir(newjosnPath.c_str(), S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
+#endif
+				Copy_Json_File(newPath, newjosnPath);
+			}
+		}
+		else  
+		{
+			string filename     = folderPath + "\\" + FileInfo.name;
+			string jsonfilename = newfolderPath + "\\" + FileInfo.name;
+			//开始拷贝文件
+			Tranfile(filename.c_str(), jsonfilename.c_str());
+		}
+	} while (_findnext(Handle, &FileInfo) == 0);
+
+	_findclose(Handle);
+#else
+	DIR *dp;
+	struct dirent *entry;
+	struct stat statbuf;
+	if((dp = opendir(folderPath.c_str())) == NULL) 
+	{
+		printf(stderr,"cannot open directory: %s\n", folderPath.c_str());
+		return;
+	}
+	chdir(folderPath.c_str());
+	while((entry = readdir(dp)) != NULL) 
+	{
+		lstat(entry->d_name,&statbuf);
+		if(S_ISDIR(statbuf.st_mode)) 
+		{
+			if(strcmp(".",entry->d_name) == 0 || strcmp("..",entry->d_name) == 0)
+			{
+				continue;
+			}
+
+			string newPath     = folderPath + "\\" + entry->d_name;
+			string newjosnPath = newfolderPath + "\\" + entry->d_name;
+			Copy_Json_File(newPath, newjosnPath);
+		} 
+		else 
+		{
+			string filename = folderPath + "\\" + entry->d_name;
+			obj_vec_Xml_File_Name.push_back(filename);
+		}
+	}
+	chdir("..");
+	closedir(dp);
+#endif
+}
+
 void Check_Include_File(_Table_Info& obj_Class_Info, _XML_Proc& obj_XML_Proc, vec_Include_Info& obj_vec_Include_Info)
 {
 	obj_vec_Include_Info.clear();
@@ -132,6 +208,14 @@ void Create_Environment(_XML_Proc& obj_XML_Proc)
 
 	//创建DataWrapper目录
 	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DataWrapper", obj_XML_Proc.m_sz_ProcName);
+#ifdef WIN32
+	_mkdir(szTempPath);
+#else
+	mkdir(szTempPath, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
+#endif
+
+	//创建ShareMemory目录
+	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/ShareMemory", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
 #else
@@ -223,6 +307,12 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 
 		sprintf_safe(szTemp, 200, "#include \"Common_Define.h\"\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+		{
+			sprintf_safe(szTemp, 200, "#include \"ShareMemory/ShareMemory.h\"\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
 
 		sprintf_safe(szTemp, 200, "#include <string>\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -472,10 +562,11 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "private:\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t%s m_list_%s[%d];\n\n", 
+			sprintf_safe(szTemp, 200, "\t%s* m_list_%s;\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tint m_list_Count;\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//声明map和vector
@@ -1116,6 +1207,11 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tm_list_%s = NULL;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tm_list_Count = 0;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -1126,6 +1222,22 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) == 0)
+			{
+				sprintf_safe(szTemp, 200, "\tif(NULL != m_list_%s)\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tdelete[] m_list_%s;\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tm_list_%s = NULL;\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -1135,6 +1247,43 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			//这里判断是否有共享内存标签，如果有填充共享内存代码
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+			{
+				sprintf_safe(szTemp, 200, "\tshm_id obj_shm_id = 0;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\tsize_t st_PoolSize = sizeof(%s) * %d;\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\tm_list_%s = Open_Share_Memory_API(%s, st_PoolSize, obj_shm_id);\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\tm_list_%s = new %s[%d];\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
+			sprintf_safe(szTemp, 200, "\tif(NULL == m_list_%s)\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\treturn;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tm_list_Count = %d;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1340,6 +1489,10 @@ void Create_Proc(_Proc_Define_Info& obj_Proc_Define_Info, _XML_Proc& obj_XML_Pro
 	sprintf_safe(szSrcPath, MAX_BUFF_100, "../rapidjson");
 	sprintf_safe(szTagpath, MAX_BUFF_100, "./%s/rapidjson", obj_XML_Proc.m_sz_ProcName);
 	Copy_Json_File(szSrcPath, szTagpath);
+
+	sprintf_safe(szSrcPath, MAX_BUFF_100, "../ShareMemory");
+	sprintf_safe(szTagpath, MAX_BUFF_100, "./%s/ShareMemory", obj_XML_Proc.m_sz_ProcName);
+	Copy_ShareMemory_File(szSrcPath, szTagpath);
 
 	Create_Define_H(obj_Proc_Define_Info);
 

@@ -20,7 +20,9 @@
 		<Column name="CUserGrid" classtype="CUserGrid" length="20" />
 	</TableClass> 
   
-	<TableClass database="db_test" table="tb_UserData" class="CUserData" classpool="500" key="ID" func="select;insert;update;delete;" desc="">
+	<!-- 如果这个对象需要内存池，需要指定classpool标签的个数，如果需要共享内存，则需要填写shmkey(为保证跨平台key必须是数字) -->
+	<!-- key是pool需要用到的关键字，必须是class里面的成员，用于map对象检索 -->
+	<TableClass database="db_test" table="tb_UserData" class="CUserData" classpool="500" shmkey="1111" key="ID" func="select;insert;update;delete;" desc="">
 		<Column name="ID" dbtype="int" classtype="int" value="0" />
 		<Column name="Nick" dbtype="varchar" classtype="char" length="20" value="'\0'" />
 		<Column name="Job" dbtype="int" classtype="int" value="0" />

@@ -96,6 +96,7 @@ struct _Table_Info
 	char m_sz_SerialType[MAX_BUFF_50];
 	char m_sz_Desc[MAX_BUFF_100];
 	char m_sz_key[MAX_BUFF_50];
+	char m_sz_ShmKey[MAX_BUFF_50];
 	int  m_n_Class_Pool;
 	vec_Column_Info m_obj_vec_Column_Info;
 
@@ -108,6 +109,7 @@ struct _Table_Info
 		m_sz_SerialType[0]  = '\0';
 		m_sz_Desc[0]        = '\0';
 		m_sz_key[0]         = '\0';
+		m_sz_ShmKey[0]      = '\0';
 		m_n_Class_Pool      = 0;
 	}
 };
@@ -149,6 +151,7 @@ struct _Table_Ext
 	char m_sz_Db_Name[MAX_BUFF_50];
 	char m_sz_Class_Name[MAX_BUFF_50];
 	char m_sz_UnionKey[MAX_BUFF_50];
+	
 	vec_Table_Ext_Index m_obj_vec_Table_Ext_Index;
 	vec_Table_Ext_SQL m_obj_vec_Table_Ext_SQL;
 
