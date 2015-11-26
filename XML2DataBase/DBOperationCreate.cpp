@@ -1056,7 +1056,9 @@ bool Create_DB_Script(_XML_Proc& obj_XML_Proc)
 		if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_SerialType, "") == 0)
 		{
 			//如果是需要生成数据库表的
-			sprintf_safe(szTemp, sizeof(szTemp), "CREATE TABLE %s(\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Db_Name);
+			sprintf_safe(szTemp, sizeof(szTemp), "CREATE TABLE %s.%s(\n", 
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Db_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
 			{
