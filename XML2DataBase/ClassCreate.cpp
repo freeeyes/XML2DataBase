@@ -685,12 +685,15 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 		sprintf_safe(szTemp, 200, "#include \"%s.h\"\n\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-		//添加单件初始化
-		sprintf_safe(szTemp, 200, "%s_Pool *%s_Pool::obj_%s_Pool_Instance = NULL;\n",
-			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0)
+		{
+			//添加单件初始化
+			sprintf_safe(szTemp, 200, "%s_Pool *%s_Pool::obj_%s_Pool_Instance = NULL;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
 
 		sprintf_safe(szTemp, 200, "%s::%s()\n", 
 			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name, 
@@ -1333,8 +1336,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, 200, "\tm_list_%s = (%s* )Open_Share_Memory_API(%s, st_PoolSize, obj_shm_id);\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
 			else
