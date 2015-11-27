@@ -30,6 +30,6 @@
 		<!-- 最后更新时间，这个字段由update的时候，自动记录。-->
 		<Column name="Activetime" dbtype="date" classtype="int" value="0" />
 		<!-- 用户身上物品格子。用于测试类之间的包含，这部分存储为json到数据库 -->
-		<Column name="CUserGridList" dbtype="char" length="1000" classtype="CUserGridList" />
+		<Column name="CUserGridList" dbtype="char" length="2" classtype="CUserGridList" />
 	</TableClass>
 </configer>

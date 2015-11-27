@@ -711,7 +711,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0
 				&& strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Init_Value) > 0)
 			{
-				sprintf_safe(szTemp, 200, "\tif(strcmp(m_obj_%s, \"\") == 0)\n",
+				sprintf_safe(szTemp, 200, "\tif(strcmp(m_obj_%s, \"\") != 0)\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
@@ -822,7 +822,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\tif(nIndex < 0 && nIndex >= %d);\n", 
+					sprintf_safe(szTemp, 200, "\tif(nIndex < 0 && nIndex >= %d)\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t{\n");
@@ -846,7 +846,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\tif(nIndex < 0 && nIndex >= %d);\n", 
+					sprintf_safe(szTemp, 200, "\tif(nIndex < 0 && nIndex >= %d)\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t{\n");
@@ -1097,7 +1097,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t\t{\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-						sprintf_safe(szTemp, 200, "\t\t\tfor(int i = 0; i < d[\"array_%s\"].Size(); i++)\n",
+						sprintf_safe(szTemp, 200, "\t\t\tfor(int i = 0; i < (int)d[\"array_%s\"].Size(); i++)\n",
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t\t\t{\n");
@@ -1258,9 +1258,10 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tm_list_%s = Open_Share_Memory_API(%s, st_PoolSize, obj_shm_id);\n",
+				sprintf_safe(szTemp, 200, "\tm_list_%s = (%s* )Open_Share_Memory_API(%s, st_PoolSize, obj_shm_id);\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
@@ -1285,16 +1286,55 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "\tm_list_Count = %d;\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t{\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t}\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+			{
+				//开始根据共享内存还原数据结构map和vector
+				sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tif(true == m_list_%s[i].Check_Init())\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\telse\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//
+				sprintf_safe(szTemp, 200, "\t\t\tm_map_%s.insert(map_%s::value_type(m_list_%s[i].get_%s(), &m_list_%s[i]));\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
