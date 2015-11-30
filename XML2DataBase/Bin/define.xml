@@ -1,8 +1,15 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- add by freeeyes -->
+<!-- 在这里定义程序中需要用到的宏类型 -->
+<!-- 亦可定义相关的枚举 -->
 <configer ProcName="DBTest" DB="mysql">
 	<define srcType="unsigned char" tagType="uint8" desc="uint8" />
 	<define srcType="unsigned short" tagType="uint16" desc="uint16" />
 	<define srcType="unsigned int" tagType="uint32" desc="uint32" />
+	<enum name="ItemType">
+		<Info name="STRONGE" />
+		<Info name="AGILE" />
+		<Info name="AGILE" />
+	</enum>
 </configer>

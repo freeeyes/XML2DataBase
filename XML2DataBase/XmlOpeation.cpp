@@ -181,10 +181,31 @@ bool CXmlOpeation::Parse_XML_Define_File(char* pFileName, _Proc_Define_Info& obj
 		}
 
 		TiXmlElement* pMainElement = pMainNode->ToElement();
-		sprintf_safe(obj_Define_Info.m_szSrcType, MAX_BUFF_50, "%s", pMainElement->Attribute("srcType"));
-		sprintf_safe(obj_Define_Info.m_szTagType, MAX_BUFF_50, "%s", pMainElement->Attribute("tagType"));
-		sprintf_safe(obj_Define_Info.m_szDesc, MAX_BUFF_100, "%s", pMainElement->Attribute("desc"));
-		obj_Proc_Define_Info.obj_vec_Define_Info.push_back(obj_Define_Info);
+		if(strcmp("define", pMainElement->Value()) == 0)
+		{
+			sprintf_safe(obj_Define_Info.m_szSrcType, MAX_BUFF_50, "%s", pMainElement->Attribute("srcType"));
+			sprintf_safe(obj_Define_Info.m_szTagType, MAX_BUFF_50, "%s", pMainElement->Attribute("tagType"));
+			sprintf_safe(obj_Define_Info.m_szDesc, MAX_BUFF_100, "%s", pMainElement->Attribute("desc"));
+			obj_Proc_Define_Info.obj_vec_Define_Info.push_back(obj_Define_Info);
+		}
+		else if(strcmp("enum", pMainElement->Value()) == 0)
+		{
+			_Enum_Info  obj_Enum_Info;
+			TiXmlNode* pEnumNode     = NULL;
+			sprintf_safe(obj_Enum_Info.m_szEnum, MAX_BUFF_50, "%s", pMainElement->Attribute("name"));
+
+			//µÃµ½Ã¶¾Ù×Ö¶Î
+			for(pEnumNode = pMainNode->FirstChildElement();pEnumNode;pEnumNode=pEnumNode->NextSiblingElement())
+			{
+				_Enum_Name_Info obj_Enum_Name_Info;
+				TiXmlElement* pEnumElement = pEnumNode->ToElement();
+
+				sprintf_safe(obj_Enum_Name_Info.m_szEnumName, MAX_BUFF_50, "%s", pEnumElement->Attribute("name"));
+				obj_Enum_Info.obj_vec_Enum_Name_Info.push_back(obj_Enum_Name_Info);
+			}
+
+			obj_Proc_Define_Info.obj_vec_Enum_Info.push_back(obj_Enum_Info);
+		}
 	}
 
 	delete m_pTiXmlDocument;

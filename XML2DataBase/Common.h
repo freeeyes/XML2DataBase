@@ -37,11 +37,35 @@ struct _Define_Info
 };
 typedef vector<_Define_Info> vec_Define_Info;
 
+struct _Enum_Name_Info
+{
+	char m_szEnumName[MAX_BUFF_50];
+
+	_Enum_Name_Info()
+	{
+		m_szEnumName[0] = '\0';
+	}
+};
+typedef vector<_Enum_Name_Info> vec_Enum_Name_Info;
+
+struct _Enum_Info
+{
+	char m_szEnum[MAX_BUFF_50];
+	vec_Enum_Name_Info obj_vec_Enum_Name_Info;
+
+	_Enum_Info()
+	{
+		m_szEnum[0] = '\0';
+	}
+};
+typedef vector<_Enum_Info> vec_Enum_Info;
+
 struct _Proc_Define_Info
 {
 	char m_szProcName[MAX_BUFF_50];
 	char m_szDBType[MAX_BUFF_50];
 	vec_Define_Info obj_vec_Define_Info;
+	vec_Enum_Info   obj_vec_Enum_Info;
 
 	_Proc_Define_Info()
 	{

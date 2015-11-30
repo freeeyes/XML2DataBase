@@ -247,12 +247,35 @@ void Create_Define_H(_Proc_Define_Info& obj_Proc_Define_Info)
 	sprintf_safe(szTemp, 200, "#include <stdio.h>\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+	//编写预定义代码
 	for(int i = 0; i < (int)obj_Proc_Define_Info.obj_vec_Define_Info.size(); i++)
 	{
 		sprintf_safe(szTemp, 200, "#define %s %s //%s\n", 
 			obj_Proc_Define_Info.obj_vec_Define_Info[i].m_szTagType,
 			obj_Proc_Define_Info.obj_vec_Define_Info[i].m_szSrcType,
 			obj_Proc_Define_Info.obj_vec_Define_Info[i].m_szDesc);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	}
+
+	sprintf_safe(szTemp, 200, "\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//编写枚举代码
+	for(int i = 0; i < (int)obj_Proc_Define_Info.obj_vec_Enum_Info.size(); i++)
+	{
+		sprintf_safe(szTemp, 200, "enum %s\n",
+			obj_Proc_Define_Info.obj_vec_Enum_Info[i].m_szEnum);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		for(int j = 0; j < (int)obj_Proc_Define_Info.obj_vec_Enum_Info[i].obj_vec_Enum_Name_Info.size(); j++)
+		{
+			sprintf_safe(szTemp, 200, "\t%s = %d,\n",
+				obj_Proc_Define_Info.obj_vec_Enum_Info[i].obj_vec_Enum_Name_Info[j].m_szEnumName,
+				j);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 

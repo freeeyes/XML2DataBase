@@ -106,24 +106,6 @@ int main(int argc, char* argv[])
 	Create_Proc(obj_Proc_Define_Info, obj_XML_Proc);
 	Create_DB_Proc(obj_XML_Proc);
 
-	//·ÏÆú´úÂë
-	//_Proc_Info        obj_Proc_Info;
-	//_DB_Proc          obj_DB_Proc;
-
-	//bool blState = obj_XmlOpeation.Parse_XML_Class_File("protocol.xml", obj_Proc_Info);
-	//if(false == blState)
-	//{
-	//	printf("[Main]Get XML(protocol.xml) error.\n");
-	//	printf("[Main]please any key to exit.\n");
-	//	getchar();
-	//}
-
-	//obj_XmlOpeation.Parse_XML_DB_File("dbconfig.xml", obj_DB_Proc);
-
-	//Create_Proc(obj_Proc_Define_Info, obj_Proc_Info);
-
-	//Create_DB_Proc(obj_DB_Proc);
-	//getchar();
 	return 0;
 }
 
