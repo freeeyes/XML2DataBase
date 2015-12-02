@@ -588,6 +588,12 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "private:\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+			{
+				sprintf_safe(szTemp, 200, "\tshm_id m_obj_shm_id;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
 			sprintf_safe(szTemp, 200, "\t%s* m_list_%s;\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
@@ -1336,6 +1342,20 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, 200, "\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
+			else
+			{
+				//释放共享内存连接
+				sprintf_safe(szTemp, 200, "\tif(NULL != m_list_%s && m_obj_shm_id > 0)\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tClose_Share_Memory_API((char* )m_list_%s, m_obj_shm_id);\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -1350,13 +1370,11 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			//这里判断是否有共享内存标签，如果有填充共享内存代码
 			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
 			{
-				sprintf_safe(szTemp, 200, "\tshm_id obj_shm_id = 0;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\tsize_t st_PoolSize = sizeof(%s) * %d;\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\tm_list_%s = (%s* )Open_Share_Memory_API(%s, st_PoolSize, obj_shm_id);\n",
+				sprintf_safe(szTemp, 200, "\tm_list_%s = (%s* )Open_Share_Memory_API(%s, st_PoolSize, m_obj_shm_id);\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey);
