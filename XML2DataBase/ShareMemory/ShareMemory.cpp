@@ -25,7 +25,7 @@ char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_sh
 	DWORD creation    = OPEN_ALWAYS;
 	 
 	LPSECURITY_ATTRIBUTES sa_local = {0};
-	obj_local_id = CreateFileA(sz_Key, 
+	obj_local_id = ::CreateFileA(sz_Key, 
 							   access,
 							   shared_mode,
 							   sa_local,
@@ -33,8 +33,24 @@ char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_sh
 							   0, 
 							   0);
 
+	//得到文件大小
+	DWORD dwFileSize = ::GetFileSize(obj_local_id, NULL);
+	if(dwFileSize > 0 && dwFileSize != obj_shm_size)
+	{
+		//如果共享内存文件大小不匹配，需要删除文件重建
+		::CloseHandle(obj_local_id);
+		::DeleteFileA(sz_Key);
+		obj_local_id = ::CreateFileA(sz_Key, 
+			access,
+			shared_mode,
+			sa_local,
+			creation,
+			0, 
+			0);
+	}
+
 	//创建新的共享内存
-	obj_shm_id = CreateFileMappingA(obj_local_id, &sa, PAGE_READWRITE, 0, (DWORD)obj_shm_size, (LPCSTR)sz_Key);
+	obj_shm_id = ::CreateFileMappingA(obj_local_id, &sa, PAGE_READWRITE, 0, (DWORD)obj_shm_size, (LPCSTR)sz_Key);
 	if(obj_shm_id != 0)
 	{
 		char* pBase = (char* )MapViewOfFile(obj_shm_id, FILE_MAP_ALL_ACCESS, 0, 0, 0);
@@ -43,10 +59,28 @@ char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_sh
 	}
 #else
 	//先寻找指定的共享内存是否存在
-	obj_shm_id = shmget(obj_key, 0, PERMS_IPC))
+	obj_shm_id = shmget(obj_key, 0, PERMS_IPC);
 	if(obj_shm_id > 0)
 	{
-		return (char *)shmat(obj_shm_id, (char *)0, 0)
+		//获得当前共享内存大小
+		struct shmid_ds buf;
+		shmctl(obj_shm_id, IPC_STAT, &buf);
+		int n_Curr_Shm_Size = buf.shm_segsz;
+		if(n_Curr_Shm_Size != (int)obj_shm_size)
+		{
+			//共享内存大小不一致，关闭共享内存，重新创建
+			int nRet = shmctl(obj_shm_id, IPC_RMID, &buf);
+			if(0 != nRet)
+			{
+				printf("[Open_Share_Memory_API](%d)(%d)delete shm fail(%d).\n", 
+					n_Curr_Shm_Size, obj_shm_size, errno);
+				return NULL;
+			}
+		}
+		else
+		{
+			return (char *)shmat(obj_shm_id, (char *)0, 0);
+		}
 	}
 
 	//创建新的共享内存

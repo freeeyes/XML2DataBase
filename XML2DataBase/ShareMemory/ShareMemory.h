@@ -12,7 +12,8 @@
 #include <sys/stat.h>  
 #include <sys/types.h>  
 #include <sys/ipc.h>  
-#include <sys/shm.h>  
+#include <sys/shm.h> 
+#include <errno.h> 
 #endif
 
 typedef unsigned int shm_key;
