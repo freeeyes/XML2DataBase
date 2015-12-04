@@ -1,10 +1,12 @@
 #include "ShareMemory.h"
 
-char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_shm_id)
+char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_shm_id, bool& blIsCreate)
 {
 #ifdef WIN32
 	char sz_Key[50] = {'\0'};
 	sprintf_s(sz_Key, 50, "%d", obj_key);
+
+	blIsCreate = true;
 
 	//设置属性
 	SECURITY_DESCRIPTOR sd = {0};
@@ -48,6 +50,12 @@ char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_sh
 			0, 
 			0);
 	}
+	else if(dwFileSize > 0)
+	{
+		//打开共享内存
+		blIsCreate = false;
+	}
+	
 
 	//创建新的共享内存
 	obj_shm_id = ::CreateFileMappingA(obj_local_id, &sa, PAGE_READWRITE, 0, (DWORD)obj_shm_size, (LPCSTR)sz_Key);
@@ -58,6 +66,8 @@ char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_sh
 		return pBase;
 	}
 #else
+	blIsCreate = true;
+
 	//先寻找指定的共享内存是否存在
 	obj_shm_id = shmget(obj_key, 0, PERMS_IPC);
 	if(obj_shm_id > 0)
@@ -79,6 +89,7 @@ char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_sh
 		}
 		else
 		{
+			blIsCreate = false;
 			return (char *)shmat(obj_shm_id, (char *)0, 0);
 		}
 	}
@@ -93,9 +104,10 @@ char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_sh
 	return NULL;
 }
 
-void Close_Share_Memory_API(const char* pBase, shm_id& obj_shm_id)
+void Close_Share_Memory_API(const char* pBase, shm_id& obj_shm_id, size_t stPoolSize)
 {
 #ifdef WIN32
+	FlushViewOfFile(pBase, stPoolSize); 
 	UnmapViewOfFile(pBase);
 	CloseHandle(obj_shm_id); 
 #else

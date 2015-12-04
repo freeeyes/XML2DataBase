@@ -25,10 +25,10 @@ typedef int shm_id;
 #define PERMS_IPC 0600
 #endif
 
-//打开一个共享内存
-char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_shm_id);
+//打开一个共享内存,blIsCreate为true则是被创建的,为false是打开的。
+char* Open_Share_Memory_API(shm_key obj_key, size_t obj_shm_size, shm_id& obj_shm_id, bool& blIsCreate);
 
 //关闭一个共享内存
-void Close_Share_Memory_API(const char* pBase, shm_id& obj_shm_id);
+void Close_Share_Memory_API(const char* pBase, shm_id& obj_shm_id, size_t stPoolSize);
 
 #endif
