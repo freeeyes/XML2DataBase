@@ -1,2 +1,2 @@
 # XML2DataBase
-XML auto make C++ DataBase and memory code
+Generate C++ code for mysql and share memory through XML automatically
