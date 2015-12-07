@@ -54,8 +54,8 @@ bool Read_Xml_Folder( string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Nam
 	struct stat statbuf;
 	if((dp = opendir(folderPath.c_str())) == NULL) 
 	{
-		printf(stderr,"cannot open directory: %s\n", folderPath.c_str());
-		return;
+		printf("cannot open directory: %s\n", folderPath.c_str());
+		return false;
 	}
 	chdir(folderPath.c_str());
 	while((entry = readdir(dp)) != NULL) 
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 		getchar();
 	}
 
-	obj_XmlOpeation.Parse_XML_Define_File("define.xml", obj_Proc_Define_Info);
+	obj_XmlOpeation.Parse_XML_Define_File((char* )"define.xml", obj_Proc_Define_Info);
 	sprintf_safe(obj_XML_Proc.m_sz_ProcName, MAX_BUFF_50, "%s", obj_Proc_Define_Info.m_szProcName);
 	sprintf_safe(obj_XML_Proc.m_sz_DBType, MAX_BUFF_50, "%s", obj_Proc_Define_Info.m_szDBType);
 

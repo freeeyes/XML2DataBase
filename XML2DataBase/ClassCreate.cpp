@@ -19,16 +19,13 @@ void Copy_Json_File(string folderPath, string newfolderPath)
 			//这个语句很重要
 			if( (strcmp(FileInfo.name,".") != 0 ) &&(strcmp(FileInfo.name,"..") != 0))   
 			{
-				string newPath     = folderPath + "\\" + FileInfo.name;
+				string newfolderPath = folderPath + "\\" + FileInfo.name;
 				string newjosnPath = newfolderPath + "\\" + FileInfo.name;
 
 				//创建新的映射目录
-#ifdef WIN32
 				_mkdir(newjosnPath.c_str());
-#else
-				mkdir(newjosnPath.c_str(), S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
-#endif
-				Copy_Json_File(newPath, newjosnPath);
+
+				Copy_Json_File(newfolderPath, newjosnPath);
 			}
 		}
 		else  
@@ -45,33 +42,42 @@ void Copy_Json_File(string folderPath, string newfolderPath)
 	DIR *dp;
 	struct dirent *entry;
 	struct stat statbuf;
+	printf("[Copy_Json_File]folderPath=%s\n", folderPath.c_str());
 	if((dp = opendir(folderPath.c_str())) == NULL) 
 	{
-		printf(stderr,"cannot open directory: %s\n", folderPath.c_str());
+		printf("cannot open directory: %s\n", folderPath.c_str());
 		return;
 	}
-	chdir(folderPath.c_str());
+	//chdir(folderPath.c_str());
 	while((entry = readdir(dp)) != NULL) 
 	{
-		lstat(entry->d_name,&statbuf);
+		string tmpName = folderPath + "/" + entry->d_name;
+		lstat(tmpName.c_str(),&statbuf);
 		if(S_ISDIR(statbuf.st_mode)) 
 		{
-			if(strcmp(".",entry->d_name) == 0 || strcmp("..",entry->d_name) == 0)
+			printf("[Copy_Json_File]S_ISDIR=%s\n", entry->d_name);
+			if(strcmp(".",entry->d_name) != 0 && strcmp("..",entry->d_name) != 0)
 			{
-				continue;
-			}
+				string subfolderPath = folderPath + "/" + entry->d_name;
+				string newjosnPath = newfolderPath + "/" + entry->d_name;
+				printf("[Copy_Json_File]newfolderPath=%s\n", subfolderPath.c_str());
+				printf("[Copy_Json_File]newjosnPath=%s\n", newjosnPath.c_str());
+				//创建新的映射目录
+				mkdir(newjosnPath.c_str(), S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
 
-			string newPath     = folderPath + "\\" + entry->d_name;
-			string newjosnPath = newfolderPath + "\\" + entry->d_name;
-			Copy_Json_File(newPath, newjosnPath);
+				Copy_Json_File(subfolderPath, newjosnPath);
+			}
 		} 
 		else 
 		{
-			string filename = folderPath + "\\" + entry->d_name;
-			obj_vec_Xml_File_Name.push_back(filename);
+			printf("[Copy_Json_File]file=%s\n", entry->d_name);
+			string filename     = folderPath + "/" + entry->d_name;
+			string jsonfilename = newfolderPath + "/" + entry->d_name;
+			//开始拷贝文件
+			Tranfile(filename.c_str(), jsonfilename.c_str());
 		}
 	}
-	chdir("..");
+	//chdir("..");
 	closedir(dp);
 #endif
 }
@@ -99,12 +105,9 @@ void Copy_ShareMemory_File(string folderPath, string newfolderPath)
 				string newjosnPath = newfolderPath + "\\" + FileInfo.name;
 
 				//创建新的映射目录
-#ifdef WIN32
 				_mkdir(newjosnPath.c_str());
-#else
-				mkdir(newjosnPath.c_str(), S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
-#endif
-				Copy_Json_File(newPath, newjosnPath);
+
+				Copy_ShareMemory_File(newPath, newjosnPath);
 			}
 		}
 		else  
@@ -123,10 +126,10 @@ void Copy_ShareMemory_File(string folderPath, string newfolderPath)
 	struct stat statbuf;
 	if((dp = opendir(folderPath.c_str())) == NULL) 
 	{
-		printf(stderr,"cannot open directory: %s\n", folderPath.c_str());
+		printf("cannot open directory: %s\n", folderPath.c_str());
 		return;
 	}
-	chdir(folderPath.c_str());
+
 	while((entry = readdir(dp)) != NULL) 
 	{
 		lstat(entry->d_name,&statbuf);
@@ -137,22 +140,29 @@ void Copy_ShareMemory_File(string folderPath, string newfolderPath)
 				continue;
 			}
 
-			string newPath     = folderPath + "\\" + entry->d_name;
-			string newjosnPath = newfolderPath + "\\" + entry->d_name;
-			Copy_Json_File(newPath, newjosnPath);
+			string subfolderPath = folderPath + "/" + entry->d_name;
+			string newjosnPath = newfolderPath + "/" + entry->d_name;
+			//创建新的映射目录
+			mkdir(newjosnPath.c_str(), S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
+
+			Copy_ShareMemory_File(subfolderPath, newjosnPath);
 		} 
 		else 
 		{
-			string filename = folderPath + "\\" + entry->d_name;
-			obj_vec_Xml_File_Name.push_back(filename);
+			string filename     = folderPath + "/" + entry->d_name;
+			string jsonfilename = newfolderPath + "/" + entry->d_name;
+
+			printf("filename: %s\n", filename.c_str());
+			printf("jsonfilename: %s\n", jsonfilename.c_str());
+			//开始拷贝文件
+			Tranfile(filename.c_str(), jsonfilename.c_str());
 		}
 	}
-	chdir("..");
 	closedir(dp);
 #endif
 }
 
-void Check_Include_File(_Table_Info& obj_Class_Info, _XML_Proc& obj_XML_Proc, vec_Include_Info& obj_vec_Include_Info)
+void Check_Include_File(_Table_Info obj_Class_Info, _XML_Proc& obj_XML_Proc, vec_Include_Info& obj_vec_Include_Info)
 {
 	obj_vec_Include_Info.clear();
 
@@ -190,6 +200,7 @@ void Check_Include_File(_Table_Info& obj_Class_Info, _XML_Proc& obj_XML_Proc, ve
 void Create_Environment(_XML_Proc& obj_XML_Proc)
 {
 	char szTempPath[MAX_BUFF_50]   = {'\0'};
+
 	//创建工程文件夹
 	sprintf_safe(szTempPath, MAX_BUFF_50, "%s", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
@@ -544,7 +555,7 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			
+
 			sprintf_safe(szTemp, 200, "private:\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t%s_Pool();\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
@@ -1092,7 +1103,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t\tarray.PushBack(obj, allocator);\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-						
+
 						sprintf_safe(szTemp, 200, "\t}\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\td.AddMember(\"array_%s\", array, allocator);\n",
@@ -1711,7 +1722,7 @@ void Create_Proc(_Proc_Define_Info& obj_Proc_Define_Info, _XML_Proc& obj_XML_Pro
 
 	sprintf_safe(szSrcPath, MAX_BUFF_100, "../ShareMemory");
 	sprintf_safe(szTagpath, MAX_BUFF_100, "./%s/ShareMemory", obj_XML_Proc.m_sz_ProcName);
-	Copy_ShareMemory_File(szSrcPath, szTagpath);
+	//Copy_ShareMemory_File(szSrcPath, szTagpath);
 
 	Create_Define_H(obj_Proc_Define_Info);
 
