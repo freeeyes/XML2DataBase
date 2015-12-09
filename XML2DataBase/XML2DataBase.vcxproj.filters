@@ -42,6 +42,9 @@
     <ClInclude Include="ShareMemory\ShareMemory.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="PoolTest.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="XML2DataBase.cpp">
@@ -69,6 +72,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ShareMemory\ShareMemory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PoolTest.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

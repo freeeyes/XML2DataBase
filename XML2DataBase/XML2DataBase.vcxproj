@@ -86,6 +86,7 @@
     <ClInclude Include="ClassCreate.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DBOperationCreate.h" />
+    <ClInclude Include="PoolTest.h" />
     <ClInclude Include="ShareMemory\ShareMemory.h" />
     <ClInclude Include="TinyXML\tinystr.h" />
     <ClInclude Include="TinyXML\tinyxml.h" />
@@ -94,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="ClassCreate.cpp" />
     <ClCompile Include="DBOperationCreate.cpp" />
+    <ClCompile Include="PoolTest.cpp" />
     <ClCompile Include="ShareMemory\ShareMemory.cpp" />
     <ClCompile Include="TinyXML\tinystr.cpp" />
     <ClCompile Include="TinyXML\tinyxml.cpp" />

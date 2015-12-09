@@ -205,6 +205,48 @@ struct _XML_Proc
 
 //**************************************************
 
+//对象池测试相关类型
+struct _PoolTest_Column
+{
+	char m_sz_Column_Name[MAX_BUFF_50];
+	char m_sz_Column_Type[MAX_BUFF_50];
+	int  m_n_Colunm_Length;
+	char m_sz_Column_Value[MAX_BUFF_50];
+
+	_PoolTest_Column()
+	{
+		m_sz_Column_Name[0]    = '\0';
+		m_sz_Column_Type[0]    = '\0';
+		m_sz_Column_Value[0]   = '\0';
+		m_n_Colunm_Length      = 0;
+	}
+};
+typedef vector<_PoolTest_Column> vec_PoolTest_Column;
+
+struct _PoolTest_Info
+{
+	char                m_sz_ClassName[MAX_BUFF_50];
+	vec_PoolTest_Column m_vec_PoolTest_Column;
+
+	_PoolTest_Info()
+	{
+		m_sz_ClassName[0] = '\0';
+	}
+};
+typedef vector<_PoolTest_Info> vec_PoolTest_Info;
+
+
+struct _PoolTest_Group
+{
+	char              m_sz_ProcName[MAX_BUFF_50];
+	vec_PoolTest_Info m_vec_PoolTest_Info;
+
+	_PoolTest_Group()
+	{
+		m_sz_ProcName[0] = '\0';
+	}
+};
+
 static void sprintf_safe(char* szText, int nLen, const char* fmt ...)
 {
 	if(szText == NULL)

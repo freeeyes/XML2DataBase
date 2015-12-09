@@ -387,3 +387,81 @@ bool CXmlOpeation::Parse_XML_Table_Files(vec_Xml_File_Name obj_vec_Xml_File_Name
 
 	return true;
 }
+
+bool CXmlOpeation::Parse_XML_Test_Pool(char* pFileName, _PoolTest_Group& obj_PoolTest_Group)
+{
+	Close();
+	m_pTiXmlDocument = new TiXmlDocument(pFileName);
+	if(NULL == m_pTiXmlDocument)
+	{
+		return false;
+	}
+
+	if(false == m_pTiXmlDocument->LoadFile())
+	{
+		return false;
+	}
+
+	TiXmlNode* pMainNode     = NULL;
+	TiXmlNode* pColumnNode   = NULL;
+
+	//获得根元素
+	m_pRootElement = m_pTiXmlDocument->RootElement();
+
+	if(NULL == m_pRootElement)
+	{
+		return false;
+	}
+
+	//获得工程名称
+	sprintf_safe(obj_PoolTest_Group.m_sz_ProcName, MAX_BUFF_50, "%s", (char* )m_pRootElement->Attribute("ProcName"));
+
+	//循环获取得测试对象池信息
+	for(pMainNode = m_pRootElement->FirstChildElement();pMainNode;pMainNode = pMainNode->NextSiblingElement())
+	{
+		int nMainType = pMainNode->Type();
+
+		if(nMainType != TiXmlText::TINYXML_ELEMENT)
+		{
+			continue;
+		}
+
+		//获得子元素名称
+		char sz_NodeName[MAX_BUFF_50] = {'\0'};
+		sprintf_safe(sz_NodeName, MAX_BUFF_50, "%s", pMainNode->ToElement()->Value());
+
+		if(strcmp("PoolTest", sz_NodeName) == 0)
+		{
+			_PoolTest_Info obj_PoolTest_Info;
+			sprintf_safe(obj_PoolTest_Info.m_sz_ClassName, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("class"));
+			for(pColumnNode = pMainNode->FirstChildElement();pColumnNode;pColumnNode=pColumnNode->NextSiblingElement())
+			{
+				_PoolTest_Column obj_Column_Info;
+
+				int nColumnType = pColumnNode->Type();
+
+				if(nColumnType != TiXmlText::TINYXML_ELEMENT)
+				{
+					continue;
+				}
+
+				TiXmlElement* pColumnElement = pColumnNode->ToElement();
+				sprintf_safe(obj_Column_Info.m_sz_Column_Name, MAX_BUFF_50, "%s", pColumnElement->Attribute("name"));
+				sprintf_safe(obj_Column_Info.m_sz_Column_Type, MAX_BUFF_50, "%s", pColumnElement->Attribute("classtype"));
+				if(NULL != pColumnElement->Attribute("length"))
+				{
+					obj_Column_Info.m_n_Colunm_Length = atoi(pColumnElement->Attribute("length"));
+				}
+				if(NULL != pColumnElement->Attribute("value"))
+				{
+					sprintf_safe(obj_Column_Info.m_sz_Column_Value, MAX_BUFF_50, "%s", pColumnElement->Attribute("value"));
+				}
+
+				obj_PoolTest_Info.m_vec_PoolTest_Column.push_back(obj_Column_Info);
+			}
+			obj_PoolTest_Group.m_vec_PoolTest_Info.push_back(obj_PoolTest_Info);
+		}
+	}
+
+	return true;
+}

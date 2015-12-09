@@ -5,6 +5,7 @@
 #include "XmlOpeation.h"
 #include "ClassCreate.h"
 #include "DBOperationCreate.h"
+#include "PoolTest.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -108,6 +109,12 @@ int main(int argc, char* argv[])
 
 	Create_Proc(obj_Proc_Define_Info, obj_XML_Proc);
 	Create_DB_Proc(obj_XML_Proc);
+
+	//Éú³É²âÊÔ³Ø´úÂë
+	_PoolTest_Group obj_PoolTest_Group;
+	obj_XmlOpeation.Parse_XML_Test_Pool((char* )"TestPool.xml", obj_PoolTest_Group);
+
+	CreatePool_Test(obj_PoolTest_Group);
 
 	return 0;
 }
