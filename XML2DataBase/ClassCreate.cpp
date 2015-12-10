@@ -42,7 +42,6 @@ void Copy_Json_File(string folderPath, string newfolderPath)
 	DIR *dp;
 	struct dirent *entry;
 	struct stat statbuf;
-	printf("[Copy_Json_File]folderPath=%s\n", folderPath.c_str());
 	if((dp = opendir(folderPath.c_str())) == NULL) 
 	{
 		printf("cannot open directory: %s\n", folderPath.c_str());
@@ -55,13 +54,13 @@ void Copy_Json_File(string folderPath, string newfolderPath)
 		lstat(tmpName.c_str(),&statbuf);
 		if(S_ISDIR(statbuf.st_mode)) 
 		{
-			printf("[Copy_Json_File]S_ISDIR=%s\n", entry->d_name);
+			//printf("[Copy_Json_File]S_ISDIR=%s\n", entry->d_name);
 			if(strcmp(".",entry->d_name) != 0 && strcmp("..",entry->d_name) != 0)
 			{
 				string subfolderPath = folderPath + "/" + entry->d_name;
 				string newjosnPath = newfolderPath + "/" + entry->d_name;
-				printf("[Copy_Json_File]newfolderPath=%s\n", subfolderPath.c_str());
-				printf("[Copy_Json_File]newjosnPath=%s\n", newjosnPath.c_str());
+				//printf("[Copy_Json_File]newfolderPath=%s\n", subfolderPath.c_str());
+				//printf("[Copy_Json_File]newjosnPath=%s\n", newjosnPath.c_str());
 				//创建新的映射目录
 				mkdir(newjosnPath.c_str(), S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
 
@@ -70,7 +69,7 @@ void Copy_Json_File(string folderPath, string newfolderPath)
 		} 
 		else 
 		{
-			printf("[Copy_Json_File]file=%s\n", entry->d_name);
+			//printf("[Copy_Json_File]file=%s\n", entry->d_name);
 			string filename     = folderPath + "/" + entry->d_name;
 			string jsonfilename = newfolderPath + "/" + entry->d_name;
 			//开始拷贝文件
@@ -200,7 +199,6 @@ void Check_Include_File(_Table_Info obj_Class_Info, _XML_Proc& obj_XML_Proc, vec
 void Create_Environment(_XML_Proc& obj_XML_Proc)
 {
 	char szTempPath[MAX_BUFF_50]   = {'\0'};
-
 	//创建工程文件夹
 	sprintf_safe(szTempPath, MAX_BUFF_50, "%s", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
@@ -255,10 +253,15 @@ void Create_Define_H(_Proc_Define_Info& obj_Proc_Define_Info)
 	sprintf_safe(szTemp, 200, "#define _COMMON_DEFINE_H_\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	sprintf_safe(szTemp, 200, "#include <stdio.h>\n\n");
+	sprintf_safe(szTemp, 200, "#include <stdio.h>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	//编写预定义代码
+	sprintf_safe(szTemp, 200, "#include <iostream>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "using namespace std;\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	for(int i = 0; i < (int)obj_Proc_Define_Info.obj_vec_Define_Info.size(); i++)
 	{
 		sprintf_safe(szTemp, 200, "#define %s %s //%s\n", 
@@ -281,12 +284,22 @@ void Create_Define_H(_Proc_Define_Info& obj_Proc_Define_Info)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		for(int j = 0; j < (int)obj_Proc_Define_Info.obj_vec_Enum_Info[i].obj_vec_Enum_Name_Info.size(); j++)
 		{
-			sprintf_safe(szTemp, 200, "\t%s = %d,\n",
-				obj_Proc_Define_Info.obj_vec_Enum_Info[i].obj_vec_Enum_Name_Info[j].m_szEnumName,
-				j);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			if (j + 1 == obj_Proc_Define_Info.obj_vec_Enum_Info[i].obj_vec_Enum_Name_Info.size())
+			{
+				sprintf_safe(szTemp, 200, "\t%s = %d\n",
+					obj_Proc_Define_Info.obj_vec_Enum_Info[i].obj_vec_Enum_Name_Info[j].m_szEnumName,
+					j);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\t%s = %d,\n",
+					obj_Proc_Define_Info.obj_vec_Enum_Info[i].obj_vec_Enum_Name_Info[j].m_szEnumName,
+					j);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
 		}
-		sprintf_safe(szTemp, 200, "}\n\n");
+		sprintf_safe(szTemp, 200, "};\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 
@@ -339,12 +352,9 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 
-		sprintf_safe(szTemp, 200, "#include \"Common_Define.h\"\n");
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
 		if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
 		{
-			sprintf_safe(szTemp, 200, "#include \"ShareMemory/ShareMemory.h\"\n");
+			sprintf_safe(szTemp, 200, "#include \"ShareMemory.h\"\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 
@@ -393,11 +403,11 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//初始化函数
-		sprintf_safe(szTemp, 200, "\tvoid Init();\n");
+		sprintf_safe(szTemp, 200, "\tvoid init();\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//初始化数据比较函数
-		sprintf_safe(szTemp, 200, "\tbool Check_Init();\n");
+		sprintf_safe(szTemp, 200, "\tbool check_init();\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//构造get和Set函数
@@ -555,7 +565,6 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
 			sprintf_safe(szTemp, 200, "private:\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t%s_Pool();\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
@@ -566,42 +575,54 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//生成对应调用方法
-			sprintf_safe(szTemp, 200, "\tvoid Init();\n");
+			sprintf_safe(szTemp, 200, "\tvoid init();\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tbool Get_Is_Create();\n");
+			//加载数据函数
+			sprintf_safe(szTemp, 200, "\tbool load_data();\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tvoid Set_Is_Create(bool bl_Is_Create);\n");
+			//保存数据函数
+			sprintf_safe(szTemp, 200, "\tbool save_data();\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\tbool get_is_create();\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\tvoid set_is_create(bool bl_Is_Create);\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, 200, "\tsize_t Get_st_PoolSize();\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\t%s* Get_Free_%s(%s obj_%s);\n", 
+			sprintf_safe(szTemp, 200, "\t%s* get_free_%s(%s obj_%s);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				szKeyType,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\t%s* Get_Used_%s(%s obj_%s);\n", 
+			sprintf_safe(szTemp, 200, "\t%s* get_used_%s(%s obj_%s);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				szKeyType,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tbool Del_Used_%s(%s obj_%s);\n", 
+			sprintf_safe(szTemp, 200, "\tbool del_used_%s(%s obj_%s);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				szKeyType,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tint Get_Used_Count();\n");
+			sprintf_safe(szTemp, 200, "\tint get_used_Count();\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tint Get_Pool_Count();\n");
+			sprintf_safe(szTemp, 200, "\tint get_pool_count();\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			//重置所有对象
+			sprintf_safe(szTemp, 200, "\tvoid clear();\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, 200, "\n");
@@ -673,10 +694,8 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t};\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
 			sprintf_safe(szTemp, 200, "public:\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
 			sprintf_safe(szTemp, 200, "\tstatic %s_Pool* getInstance()\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -695,7 +714,7 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t\t\tobj_%s_Pool_Instance->Init();\n",
+			sprintf_safe(szTemp, 200, "\t\t\tobj_%s_Pool_Instance->init();\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t\t}\n");
@@ -735,7 +754,10 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			return false;
 		}
 
-		sprintf_safe(szTemp, 200, "#include \"%s.h\"\n\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+		sprintf_safe(szTemp, 200, "#include \"%s.h\"\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0)
@@ -754,7 +776,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\tInit();\n");
+		sprintf_safe(szTemp, 200, "\tinit();\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -769,7 +791,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//添加初始化函数
-		sprintf_safe(szTemp, 200, "void %s::Init()\n", 
+		sprintf_safe(szTemp, 200, "void %s::init()\n", 
 			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n", 
@@ -814,7 +836,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//初始化数据比较函数
-		sprintf_safe(szTemp, 200, "bool %s::Check_Init()\n",
+		sprintf_safe(szTemp, 200, "bool %s::check_init()\n",
 			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
@@ -1103,7 +1125,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\t\tarray.PushBack(obj, allocator);\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
+						
 						sprintf_safe(szTemp, 200, "\t}\n");
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						sprintf_safe(szTemp, 200, "\td.AddMember(\"array_%s\", array, allocator);\n",
@@ -1388,7 +1410,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//初始化
-			sprintf_safe(szTemp, 200, "void %s_Pool::Init()\n", 
+			sprintf_safe(szTemp, 200, "void %s_Pool::init()\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1441,7 +1463,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, 200, "\t\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\t{\n");
-				sprintf_safe(szTemp, 200, "\t\t\tif(true == m_list_%s[i].Check_Init())\n",
+				sprintf_safe(szTemp, 200, "\t\t\tif(true == m_list_%s[i].check_init())\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\t\t{\n");
@@ -1498,7 +1520,36 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "bool %s_Pool::Get_Is_Create()\n",
+			sprintf_safe(szTemp, 200, "bool %s_Pool::load_data()\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			
+			sprintf_safe(szTemp, 200, "\treturn load_data_from_%s(m_list_%s, m_list_Count);\n", 
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "bool %s_Pool::save_data()\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\treturn save_data_to_%s(m_list_%s, m_list_Count);\n", 
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+
+			sprintf_safe(szTemp, 200, "bool %s_Pool::get_is_create()\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
@@ -1508,7 +1559,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "void %s_Pool::Set_Is_Create(bool bl_Is_Create)\n",
+			sprintf_safe(szTemp, 200, "void %s_Pool::set_is_create(bool bl_Is_Create)\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
@@ -1529,7 +1580,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//得到空余的对象
-			sprintf_safe(szTemp, 200, "%s* %s_Pool::Get_Free_%s(%s obj_%s)\n", 
+			sprintf_safe(szTemp, 200, "%s* %s_Pool::get_free_%s(%s obj_%s)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
@@ -1591,7 +1642,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//得到正在使用的对象函数
-			sprintf_safe(szTemp, 200, "%s* %s_Pool::Get_Used_%s(%s obj_%s)\n", 
+			sprintf_safe(szTemp, 200, "%s* %s_Pool::get_used_%s(%s obj_%s)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
@@ -1627,7 +1678,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//归还正在使用的对象函数
-			sprintf_safe(szTemp, 200, "bool %s_Pool::Del_Used_%s(%s obj_%s)\n", 
+			sprintf_safe(szTemp, 200, "bool %s_Pool::del_used_%s(%s obj_%s)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				szKeyType,
@@ -1650,7 +1701,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t\tp%s->Init();\n",
+			sprintf_safe(szTemp, 200, "\t\tp%s->init();\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t\tm_map_%s.erase(f);\n",
@@ -1676,7 +1727,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//得到正在使用的对象个数函数
-			sprintf_safe(szTemp, 200, "int %s_Pool::Get_Used_Count()\n", 
+			sprintf_safe(szTemp, 200, "int %s_Pool::get_used_Count()\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
@@ -1688,13 +1739,41 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//得到池里面总共的对象个数函数
-			sprintf_safe(szTemp, 200, "int %s_Pool::Get_Pool_Count()\n", 
+			sprintf_safe(szTemp, 200, "int %s_Pool::get_pool_count()\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\treturn (int)m_vec_%s.size();\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			//全部重置对象函数
+			sprintf_safe(szTemp, 200, "void %s_Pool::clear();\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tm_vec_%s.clear();\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tm_map_%s.clear();\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tmemset(m_list_%s, 0, m_st_PoolSize);\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t}\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1722,7 +1801,7 @@ void Create_Proc(_Proc_Define_Info& obj_Proc_Define_Info, _XML_Proc& obj_XML_Pro
 
 	sprintf_safe(szSrcPath, MAX_BUFF_100, "../ShareMemory");
 	sprintf_safe(szTagpath, MAX_BUFF_100, "./%s/ShareMemory", obj_XML_Proc.m_sz_ProcName);
-	//Copy_ShareMemory_File(szSrcPath, szTagpath);
+	Copy_ShareMemory_File(szSrcPath, szTagpath);
 
 	Create_Define_H(obj_Proc_Define_Info);
 

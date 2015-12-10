@@ -456,6 +456,10 @@ bool CXmlOpeation::Parse_XML_Test_Pool(char* pFileName, _PoolTest_Group& obj_Poo
 				{
 					sprintf_safe(obj_Column_Info.m_sz_Column_Value, MAX_BUFF_50, "%s", pColumnElement->Attribute("value"));
 				}
+				if(NULL != pColumnElement->Attribute("iskey"))
+				{
+					obj_Column_Info.m_n_IsKey = atoi(pColumnElement->Attribute("iskey"));
+				}
 
 				obj_PoolTest_Info.m_vec_PoolTest_Column.push_back(obj_Column_Info);
 			}

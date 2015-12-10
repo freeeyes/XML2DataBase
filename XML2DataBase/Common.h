@@ -212,6 +212,7 @@ struct _PoolTest_Column
 	char m_sz_Column_Type[MAX_BUFF_50];
 	int  m_n_Colunm_Length;
 	char m_sz_Column_Value[MAX_BUFF_50];
+	int  m_n_IsKey;
 
 	_PoolTest_Column()
 	{
@@ -219,6 +220,7 @@ struct _PoolTest_Column
 		m_sz_Column_Type[0]    = '\0';
 		m_sz_Column_Value[0]   = '\0';
 		m_n_Colunm_Length      = 0;
+		m_n_IsKey              = 0;
 	}
 };
 typedef vector<_PoolTest_Column> vec_PoolTest_Column;

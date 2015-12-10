@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<!-- 在这里定义生成相关的测试Pool的相关代码 -->
+<!-- 自动生成增删 测试代码，并自动生成测试结果 -->
+<configer ProcName="DBTest" DB="mysql">
+	<PoolTest class="CUserData" desc="">
+		<Column name="ID" classtype="int" value="1" iskey="1" />
+		<Column name="Nick" classtype="char" length="20" value="freeeyes" />
+		<Column name="Job" classtype="int" value="1" />
+		<Column name="Ablity" classtype="int" value="1" />
+	</PoolTest>
+</configer>

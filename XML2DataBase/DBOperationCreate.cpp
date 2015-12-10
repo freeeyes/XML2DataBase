@@ -66,7 +66,7 @@ void Create_DB_Environment(_XML_Proc& obj_XML_Proc)
 	mkdir(szTempPath, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
 #endif
 
-	//创建DBWrapper目录
+	//创建LuaIncode目录
 	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBWrapper", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
@@ -75,19 +75,17 @@ void Create_DB_Environment(_XML_Proc& obj_XML_Proc)
 #endif
 
 	//拷贝指定文件到目录中去
-	char szTempFile[MAX_BUFF_100] = {'\0'};
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
-	Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
-	Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
-	Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
-	Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
-	Tranfile("../MysqlCommon/lock.h", szTempFile);
-
-	//创建SQL脚本生成目录
+	//char szTempFile[MAX_BUFF_100] = {'\0'};
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
+	//Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
+	//Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
+	//Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
+	//Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
+	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
+	//Tranfile("../MysqlCommon/lock.h", szTempFile);
 	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBScript", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
@@ -191,6 +189,49 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 		sprintf_safe(szTemp, 200, "\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
+
+	//为对象池创建加载数据方法 start
+	for(int i = 0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		//判断是否有Pool需要声明
+		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
+		{
+			//首先得到key的类型
+			char szKeyType[MAX_BUFF_50] = {'\0'};
+			for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
+			{
+				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key, obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name) == 0)
+				{
+					sprintf_safe(szKeyType, MAX_BUFF_50, "%s", obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+					break;
+				}
+			}
+
+			//如果得不到Key类型，则不生成Pool代码
+			if(strlen(szKeyType) == 0)
+			{
+				continue;
+			}
+
+			//这里判断是否有共享内存标签，如果有填充共享内存代码
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+			{
+				sprintf_safe(szTemp, 200, "bool load_data_from_%s(%s* ptr%s, int poolsize);\n", 
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "bool save_data_to_%s(%s* ptr%s, int poolsize);\n", 
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				break;
+			}
+		}
+	}
+	//为对象池创建加载数据方法  end
 
 	sprintf_safe(szTemp, 200, "#endif\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -380,14 +421,14 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
 						{
 							//如果是字符串，特殊处理
-						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 						else
 						{
-						sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -845,6 +886,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 			if (1==obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL[j].m_n_Select_Type)
 			{
 				string strClass = "";
+
 				for(vector<string>::size_type iLoop = 0; iLoop != vecParas.size(); ++iLoop)
 				{
 					if (iLoop < vecParas.size() - 1)
@@ -881,9 +923,17 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, sizeof(szTemp), "\tvector< map<string, string> > vmResultData;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, sizeof(szTemp), "\tsnprintf(szSql, sizeof(szSql), \"%s\", %s);\n", obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL[j].m_sz_Sql_Text,
-					strValue.c_str());
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				if (strValue != "")
+				{
+					sprintf_safe(szTemp, sizeof(szTemp), "\tsnprintf(szSql, sizeof(szSql), \"%s\", %s);\n", obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL[j].m_sz_Sql_Text,strValue.c_str());
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, sizeof(szTemp), "\tsnprintf(szSql, sizeof(szSql), \"%s\");\n", 
+						obj_XML_Proc.m_obj_vec_Table_Ext[i].m_obj_vec_Table_Ext_SQL[j].m_sz_Sql_Text);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
 
 				sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->ExecuteQuery(szSql,vmResultData))\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -918,42 +968,94 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s obj;\n",strClass.c_str());
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
+				int iLoop = 0;
+				for(iLoop = 0; iLoop < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); iLoop++)
 				{
-					if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_sz_Class_Name, obj_XML_Proc.m_obj_vec_Table_Ext[i].m_sz_Class_Name) == 0)
 					{
-						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+						break;
+					}
+					else
+					{
+						continue;
+					}
+				}
+
+				if (iLoop == obj_XML_Proc.m_obj_vec_Table_Info.size())
+				{
+					printf("TableExt config error table:%s\n", obj_XML_Proc.m_obj_vec_Table_Ext[i].m_sz_Table_Name);
+				}
+
+				for(int k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info.size(); k++)
+				{
+					if(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_n_Length == 0)
+					{
+						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Db_Type, "json") == 0)
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(atoi(vmResultData[0][\"%s\"].c_str()));\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.UnSerialization(vmResultData[0][\"%s\"]);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 						else
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(vmResultData[0][\"%s\"].c_str());\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type, "int") == 0)
+							{
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(atoi((char*)vmResultData[0][\"%s\"].c_str()));\n", 
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							}
+							else
+							{
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							}
 						}
 					}
 					else
 					{
-						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Db_Type, "json") == 0)
 						{
-							//如果是字符串，特殊处理
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(vmResultData[0][\"%s\"].c_str());\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.UnSerialization(vmResultData[0][\"%s\"]);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 						else
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(vmResultData[0][\"%s\"].c_str());\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-						}
+							if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type, "char") == 0)
+							{
+								//如果是字符串，特殊处理
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							}
+							else
+							{
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							}
+						}					
 					}
 				}
 
@@ -1031,6 +1133,190 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 		}
 	}
 
+	//为对象池创建加载数据方法 start
+	for(int i = 0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		//判断是否有Pool需要声明
+		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
+		{
+			//首先得到key的类型
+			char szKeyType[MAX_BUFF_50] = {'\0'};
+			for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
+			{
+				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key, obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name) == 0)
+				{
+					sprintf_safe(szKeyType, MAX_BUFF_50, "%s", obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+					break;
+				}
+			}
+
+			//如果得不到Key类型，则不生成Pool代码
+			if(strlen(szKeyType) == 0)
+			{
+				continue;
+			}
+
+			//这里判断是否有共享内存标签，如果有填充共享内存代码
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+			{
+				sprintf_safe(szTemp, 200, "bool load_data_from_%s(%s* ptr%s, int poolsize)\n", 
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "\tvector<%s> vecObj;\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Ext.size(); j++)
+				{
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Ext[j].m_sz_Class_Name, obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name) != 0)
+					{
+						continue;
+					}
+					else
+					{
+						for(int k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Ext[j].m_obj_vec_Table_Ext_SQL.size(); k++)
+						{
+							sprintf_safe(szTemp, sizeof(szTemp), "\tbool bResult = %s(vecObj);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Ext[j].m_obj_vec_Table_Ext_SQL[0].m_sz_Func_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\tif(!bResult)\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tcout<<\"exec load_data_from_%s error\"<<endl;\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\treturn bResult;\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\tint mixpoolsize = poolsize;\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\tif(vecObj.size() < mixpoolsize)\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tmixpoolsize = vecObj.size();\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							
+							sprintf_safe(szTemp, sizeof(szTemp), "\tfor(int iLoop = 0; iLoop < mixpoolsize; ++iLoop)\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tptr%s[iLoop] = vecObj[iLoop];\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\treturn true;\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+						}
+
+						break;
+					}
+				}
+
+				sprintf_safe(szTemp, 200, "}\n\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				//test
+				sprintf_safe(szTemp, 200, "bool save_data_to_%s(%s* ptr%s, int poolsize)\n", 
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Ext.size(); j++)
+				{
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Ext[j].m_sz_Class_Name, obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name) != 0)
+					{
+						continue;
+					}
+					else
+					{
+						for(int k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Ext[j].m_obj_vec_Table_Ext_SQL.size(); k++)
+						{							
+							sprintf_safe(szTemp, sizeof(szTemp), "\tfor(int iLoop = 0; iLoop < poolsize; ++iLoop)\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tif (!ptr%s[iLoop].check_init())\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tbool bResult = update_%s(ptr%s[iLoop]);\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tif(!bResult)\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t\tcout<<\"exec save_data_to_%s error\"<<endl;\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t\treturn bResult;\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t}\n\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t}\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, sizeof(szTemp), "\treturn true;\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+						}
+
+						break;
+					}
+				}
+
+				sprintf_safe(szTemp, 200, "}\n\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//test
+			}
+		}
+	}
+	//为对象池创建加载数据方法  end
+
 	fclose(pFile);
 	return true;
 }
@@ -1041,16 +1327,13 @@ bool Create_DB_Script(_XML_Proc& obj_XML_Proc)
 	char szTemp[1024]         = {'\0'};
 	char szPathFile[200]      = {'\0'};
 	char szSQL[MAX_BUFF_1024] = {'\0'};
-
 	sprintf_safe(szPathFile, 200, "%s/DBScript/SQL_Script.sql", 
 		obj_XML_Proc.m_sz_ProcName);
-
 	FILE* pFile = fopen(szPathFile, "wb");
 	if(NULL == pFile)
 	{
 		return false;
 	}
-
 	for(int i = 0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
 	{
 		if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_SerialType, "") == 0)
@@ -1085,11 +1368,9 @@ bool Create_DB_Script(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
-
 	fclose(pFile);
 	return true;
 }
-
 void Create_DB_Proc(_XML_Proc& obj_XML_Proc)
 {
 	Create_DB_Environment(obj_XML_Proc);
@@ -1097,6 +1378,5 @@ void Create_DB_Proc(_XML_Proc& obj_XML_Proc)
 	Create_DB_H(obj_XML_Proc);
 
 	Create_DB_CPP(obj_XML_Proc);
-
 	Create_DB_Script(obj_XML_Proc);
 }

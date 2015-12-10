@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
 		printf("[Main]please any key to exit.\n");
 		getchar();
 	}
-	printf("[Main]obj_vec_Xml_File_Name(%d).\n", obj_vec_Xml_File_Name.size());
+	//printf("[Main]obj_vec_Xml_File_Name(%d).\n", obj_vec_Xml_File_Name.size());
 
 	obj_XmlOpeation.Parse_XML_Define_File((char* )"define.xml", obj_Proc_Define_Info);
 	sprintf_safe(obj_XML_Proc.m_sz_ProcName, MAX_BUFF_50, "%s", obj_Proc_Define_Info.m_szProcName);
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 
 	obj_XmlOpeation.Parse_XML_Table_Files(obj_vec_Xml_File_Name, obj_XML_Proc);
 
-	printf("[Main]vec_Table_Info(%d).\n", obj_XML_Proc.m_obj_vec_Table_Info.size());
+	//printf("[Main]vec_Table_Info(%d).\n", obj_XML_Proc.m_obj_vec_Table_Info.size());
 
 	Create_Proc(obj_Proc_Define_Info, obj_XML_Proc);
 	Create_DB_Proc(obj_XML_Proc);
