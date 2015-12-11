@@ -78,8 +78,7 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		sprintf_safe(szTemp, 200, "\tint nBefCount =  %s_Pool::getInstance()->get_used_count();\n",
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t%s* p_%s =  %s_Pool::getInstance()->get_free_%s(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+		sprintf_safe(szTemp, 200, "\t%s* p_%s =  %s_Pool::getInstance()->get_free_object(%s);\n",
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
@@ -137,8 +136,7 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//重新得到数据属性，进行比较
-		sprintf_safe(szTemp, 200, "\t%s* p_pool_%s =  %s_Pool::getInstance()->get_used_%s(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+		sprintf_safe(szTemp, 200, "\t%s* p_pool_%s =  %s_Pool::getInstance()->get_used_object(%s);\n",
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
@@ -209,13 +207,11 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t%s_Pool::getInstance()->del_used_%s(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+		sprintf_safe(szTemp, 200, "\t%s_Pool::getInstance()->del_used_object(%s);\n",
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
 			szKeyValue);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t%s* p_del_%s =  %s_Pool::getInstance()->get_used_%s(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+		sprintf_safe(szTemp, 200, "\t%s* p_del_%s =  %s_Pool::getInstance()->get_used_object(%s);\n",
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
 			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
