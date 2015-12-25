@@ -121,20 +121,24 @@ struct _Table_Info
 	char m_sz_Desc[MAX_BUFF_100];
 	char m_sz_key[MAX_BUFF_50];
 	char m_sz_ShmKey[MAX_BUFF_50];
+	char m_sz_DependClass[MAX_BUFF_50];
+	int  m_n_IsDependFunc;
 	int  m_n_Class_Pool;
 	vec_Column_Info m_obj_vec_Column_Info;
 
 	_Table_Info()
 	{
-		m_sz_Table_Name[0]  = '\0';
-		m_sz_Db_Name[0]     = '\0';
-		m_sz_Class_Name[0]  = '\0';
-		m_sz_Func[0]        = '\0';
-		m_sz_SerialType[0]  = '\0';
-		m_sz_Desc[0]        = '\0';
-		m_sz_key[0]         = '\0';
-		m_sz_ShmKey[0]      = '\0';
-		m_n_Class_Pool      = 0;
+		m_sz_Table_Name[0]  	 = '\0';
+		m_sz_Db_Name[0]     	 = '\0';
+		m_sz_Class_Name[0]  	 = '\0';
+		m_sz_Func[0]        	 = '\0';
+		m_sz_SerialType[0]  	 = '\0';
+		m_sz_Desc[0]        	 = '\0';
+		m_sz_key[0]         	 = '\0';
+		m_sz_ShmKey[0]      	 = '\0';
+		m_sz_DependClass[0] 	 = '\0';
+		m_n_IsDependFunc       	 = 0;
+		m_n_Class_Pool      	 = 0;
 	}
 };
 typedef vector<_Table_Info> vec_Table_Info;
@@ -227,12 +231,16 @@ typedef vector<_PoolTest_Column> vec_PoolTest_Column;
 
 struct _PoolTest_Info
 {
-	char                m_sz_ClassName[MAX_BUFF_50];
+	char m_sz_Table_Name[MAX_BUFF_50];
+	char m_sz_Db_Name[MAX_BUFF_50];
+	char m_sz_Class_Name[MAX_BUFF_50];
 	vec_PoolTest_Column m_vec_PoolTest_Column;
 
 	_PoolTest_Info()
 	{
-		m_sz_ClassName[0] = '\0';
+		m_sz_Table_Name[0] = '\0';
+		m_sz_Db_Name[0] = '\0';
+		m_sz_Class_Name[0] = '\0';
 	}
 };
 typedef vector<_PoolTest_Info> vec_PoolTest_Info;

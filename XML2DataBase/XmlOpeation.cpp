@@ -290,6 +290,16 @@ bool CXmlOpeation::Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XM
 			{
 				sprintf_safe(obj_Table_Info.m_sz_ShmKey, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("shmkey"));
 			}
+			if(NULL != pMainNode->ToElement()->Attribute("isdependfunc"))
+			{
+				obj_Table_Info.m_n_IsDependFunc = atoi(pMainNode->ToElement()->Attribute("isdependfunc"));
+				printf("[Parse_XML_Table_File]isdependfunc:%s\n",pMainNode->ToElement()->Attribute("isdependfunc"));
+			}
+			if(NULL != pMainNode->ToElement()->Attribute("dependclass"))
+			{
+				sprintf_safe(obj_Table_Info.m_sz_DependClass, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("dependclass"));
+				printf("[Parse_XML_Table_File]dependclass:%s\n",pMainNode->ToElement()->Attribute("dependclass"));
+			}
 			if(NULL != pMainNode->ToElement()->Attribute("desc"))
 			{
 				sprintf_safe(obj_Table_Info.m_sz_Desc, MAX_BUFF_100, "%s", pMainNode->ToElement()->Attribute("desc"));
@@ -433,7 +443,10 @@ bool CXmlOpeation::Parse_XML_Test_Pool(char* pFileName, _PoolTest_Group& obj_Poo
 		if(strcmp("PoolTest", sz_NodeName) == 0)
 		{
 			_PoolTest_Info obj_PoolTest_Info;
-			sprintf_safe(obj_PoolTest_Info.m_sz_ClassName, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("class"));
+			sprintf_safe(obj_PoolTest_Info.m_sz_Db_Name, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("database"));
+			sprintf_safe(obj_PoolTest_Info.m_sz_Table_Name, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("table"));
+			sprintf_safe(obj_PoolTest_Info.m_sz_Class_Name, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("class"));
+
 			for(pColumnNode = pMainNode->FirstChildElement();pColumnNode;pColumnNode=pColumnNode->NextSiblingElement())
 			{
 				_PoolTest_Column obj_Column_Info;

@@ -553,6 +553,17 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 				continue;
 			}
 
+			//声明map和vector
+			sprintf_safe(szTemp, 200, "typedef vector<%s*> vec_%s;\n", 
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "typedef map<%s, %s*> map_%s;\n", 
+				szKeyType,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			//生成pool相应代码
 			sprintf_safe(szTemp, 200, "//Pool Manager %s.\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -638,16 +649,6 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "\tsize_t m_st_PoolSize;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			//声明map和vector
-			sprintf_safe(szTemp, 200, "\ttypedef vector<%s*> vec_%s;\n", 
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\ttypedef map<%s, %s*> map_%s;\n", 
-				szKeyType,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\tvec_%s m_vec_%s;\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
@@ -688,6 +689,7 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "public:\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			sprintf_safe(szTemp, 200, "\tstatic %s_Pool* getInstance()\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -714,7 +716,18 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "\t\treturn obj_%s_Pool_Instance;\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t}\n");
+			sprintf_safe(szTemp, 200, "\t}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\tmap_%s& get_used_map()\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\treturn m_map_%s;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, 200, "};\n");
@@ -1454,70 +1467,205 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "\tm_list_Count = %d;\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+
+			if (obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_IsDependFunc == 1)
 			{
-				//开始根据共享内存还原数据结构map和vector
-				sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				//test
+				sprintf_safe(szTemp, 200, "\tif(m_bl_Is_Create)\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\tif(m_bl_Is_Create == false)\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t{\n");
-				sprintf_safe(szTemp, 200, "\t\t\tif(true == m_list_%s[i].check_init())\n",
+				sprintf_safe(szTemp, 200, "\t\tload_data_from_%s(m_list_%s, m_list_Count);\n", 
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\t{\n");
+				sprintf_safe(szTemp, 200, "\t}\n\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\t}\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\telse\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\t{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				//还原内存场景
-				sprintf_safe(szTemp, 200, "\t\t\t\tm_map_%s.insert(map_%s::value_type(m_list_%s[i].get_%s(), &m_list_%s[i]));\n",
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\t}\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t}\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\telse\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t{\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t}\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t}\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//test
+
+				if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+				{
+					//开始根据共享内存还原数据结构map和vector
+					sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\tif(m_bl_Is_Create == false)\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\tif(true == m_list_%s[i].check_init())\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\telse\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					//还原内存场景
+					sprintf_safe(szTemp, 200, "\t\t\t\tm_map_%s.insert(map_%s::value_type(m_list_%s[i].get_%s(), &m_list_%s[i]));\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\telse\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
 			}
 			else
 			{
-				sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+				//test
+				sprintf_safe(szTemp, 200, "\tif(m_bl_Is_Create)\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+
+				sprintf_safe(szTemp, 200, "\t\tmap_%s mapObject = %s_Pool::get_used_map();\n", 
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_DependClass,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_DependClass);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t}\n");
+
+			    sprintf_safe(szTemp, 200, "\t\tint iLoop = 0;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "\t\tfor(map_%s::iterator b = mapObject.begin(); b != mapObject.end(); b++,iLoop++)\n", 
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_DependClass);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "\t\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "\t\t\tif(iLoop < m_list_Count)\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				sprintf_safe(szTemp, 200, "\t\t\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+				for(int iloop = 0; iloop < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); iloop++)
+				{
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_DependClass, obj_XML_Proc.m_obj_vec_Table_Info[iloop].m_sz_Class_Name) == 0)
+					{
+						sprintf_safe(szTemp, 200, "\t\t\t\tm_list_%s[iLoop].set_%s(((%s*)b->second)->get_%s());\n",
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key,
+							obj_XML_Proc.m_obj_vec_Table_Info[iloop].m_sz_Class_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[iloop].m_sz_key);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						break;
+					}
+				}
+
+				sprintf_safe(szTemp, 200, "\t\t\t}\n\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				
+				sprintf_safe(szTemp, 200, "\t\t}\n\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				
+				sprintf_safe(szTemp, 200, "\t}\n\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//test
+
+				if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+				{
+					//开始根据共享内存还原数据结构map和vector
+					sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\tif(m_bl_Is_Create == false)\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\tif(true == m_list_%s[i].check_init())\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\telse\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					//还原内存场景
+					sprintf_safe(szTemp, 200, "\t\t\t\tm_map_%s.insert(map_%s::value_type(m_list_%s[i].get_%s(), &m_list_%s[i]));\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\telse\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				else
+				{
+					sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++)\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\tm_vec_%s.push_back(&m_list_%s[i]);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				}
+				
 			}
 
 			sprintf_safe(szTemp, 200, "}\n\n");

@@ -36,11 +36,14 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		return false;
 	}
 
+	sprintf_safe(szTemp, 200, "#include \"DB_Op.h\"\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	//添加要用到的.h文件头
 	for(int i = 0; i < (int)obj_PoolTest_Group.m_vec_PoolTest_Info.size(); i++)
 	{
-		sprintf_safe(szTemp, 200, "#include \"DataWrapper/%s.h\"\n", 
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+		sprintf_safe(szTemp, 200, "#include \"%s.h\"\n", 
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 	sprintf_safe(szTemp, 200, "\n"); 
@@ -64,47 +67,50 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		{
 			//如果没有主键，则不生成以下测试代码
 			sprintf_safe(szTemp, 200, "//%s_Pool is not set key,can not make test code.\n",
-				obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+				obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			continue;
 		}
 
 		//生成测试检测插入对象函数
 		sprintf_safe(szTemp, 200, "void check_%s_pool_insert()\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "\tint nBefCount =  %s_Pool::getInstance()->get_used_count();\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "\t%s* p_%s =  %s_Pool::getInstance()->get_free_object(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 			szKeyValue);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "\tif(NULL == p_%s)\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Get Free is Error.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\treturn;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tint nEndCount =  %s_Pool::getInstance()->get_used_count();\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tif(nEndCount - nBefCount != 1)\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Get Count is Error.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\treturn;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -116,16 +122,16 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		{
 			if(strcmp(obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Type, "char") == 0)
 			{
-				sprintf_safe(szTemp, 200, "\tp_%s->set_%s(\"%s\")\n",
-					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+				sprintf_safe(szTemp, 200, "\tp_%s->set_%s((char*)(\"%s\"));\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
 			else
 			{
-				sprintf_safe(szTemp, 200, "\tp_%s->set_%s(%s)\n",
-					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+				sprintf_safe(szTemp, 200, "\tp_%s->set_%s(%s);\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -137,18 +143,18 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 
 		//重新得到数据属性，进行比较
 		sprintf_safe(szTemp, 200, "\t%s* p_pool_%s =  %s_Pool::getInstance()->get_used_object(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 			szKeyValue);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tif(NULL == p_pool_%s)\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Get set used is Error.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\treturn;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -159,15 +165,15 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		{
 			if(strcmp(obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Type, "char") == 0)
 			{
-				sprintf_safe(szTemp, 200, "\tif(strcmp(p_pool_%s->get_%s(), \"%s\") != 0\n",
-					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+				sprintf_safe(szTemp, 200, "\tif(strcmp(p_pool_%s->get_%s(), \"%s\") != 0)\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Attr %s is not equal.\\n\");\n",
-					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\treturn;\n");
@@ -178,14 +184,14 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 			else
 			{
 				sprintf_safe(szTemp, 200, "\tif(p_pool_%s->get_%s() != %s)\n",
-					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Attr %s is not equal.\\n\");\n",
-					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\treturn;\n");
@@ -196,86 +202,245 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 		}
 
 		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_insert]Check insert is pass.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//生成删除测试函数
 		sprintf_safe(szTemp, 200, "void check_%s_pool_delete()\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t%s_Pool::getInstance()->del_used_object(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 			szKeyValue);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t%s* p_del_%s =  %s_Pool::getInstance()->get_used_object(%s);\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
 			szKeyValue);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tif(NULL != p_del_%s)\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_delete]delete is Error.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\treturn;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_delete]Check delete is pass.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//生成数据库测试
-		sprintf_safe(szTemp, 200, "void check_%s_pool_db_load()\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+		sprintf_safe(szTemp, 200, "void check_%s_pool_insert_record()\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_db_load]Check is pass.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+
+		sprintf_safe(szTemp, 200, "\t%s object;\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//开始赋值
+		for(int j = 0; j < (int)obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column.size(); j++)
+		{
+			if(strcmp(obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Type, "char") == 0)
+			{
+				sprintf_safe(szTemp, 200, "\tobject.set_%s((char*)(\"%s\"));\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\tobject.set_%s(%s);\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+		}
+
+		sprintf_safe(szTemp, 200, "\tinsert_%s(object);\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Table_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_insert_record]Check insert_record is pass.\\n\");\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "}\n\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//生成数据库测试
+		sprintf_safe(szTemp, 200, "void check_%s_pool_db_load()\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "\t%s_Pool::getInstance()->load_data();\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "\t%s* p_pool_%s =  %s_Pool::getInstance()->get_used_object(%s);\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+			szKeyValue);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\tif(NULL == p_pool_%s)\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Get set used is Error.\\n\");\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\treturn;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t}\n\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		for(int j = 0; j < (int)obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column.size(); j++)
+		{
+			if(strcmp(obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Type, "char") == 0)
+			{
+				sprintf_safe(szTemp, 200, "\tif(strcmp(p_pool_%s->get_%s(), \"%s\") != 0)\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Attr %s is not equal.\\n\");\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\treturn;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\tif(p_pool_%s->get_%s() != %s)\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t{\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\tprintf(\"[check_%s_pool_insert]Attr %s is not equal.\\n\");\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t\treturn;\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+		}
+
+		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_db_load]Check db_load is pass.\\n\");\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		sprintf_safe(szTemp, 200, "void check_%s_pool_db_save()\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_db_save]Check is pass.\\n\");\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_db_save]Check db_save is pass.\\n\");\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "}\n\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//生成数据库测试
+		sprintf_safe(szTemp, 200, "void check_%s_pool_delete_record()\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "\t%s object;\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//开始赋值
+		for(int j = 0; j < (int)obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column.size(); j++)
+		{
+			if(strcmp(obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Type, "char") == 0)
+			{
+				sprintf_safe(szTemp, 200, "\tobject.set_%s((char*)(\"%s\"));\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\tobject.set_%s(%s);\n",
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Name,
+					obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_vec_PoolTest_Column[j].m_sz_Column_Value);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+		}
+
+		sprintf_safe(szTemp, 200, "\tdelete_%s(object);\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Table_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "\tprintf(\"[check_%s_pool_delete_record]Check delete_record is pass.\\n\");\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//生成总测试入口函数
 		sprintf_safe(szTemp, 200, "void check_%s()\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "\tcheck_%s_pool_insert();\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "\tcheck_%s_pool_delete();\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "\tcheck_%s_pool_insert_record();\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "\tcheck_%s_pool_db_load();\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "\tcheck_%s_pool_db_save();\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "\t//check_%s_pool_delete_record();\n",
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
@@ -286,10 +451,13 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 	sprintf_safe(szTemp, 200, "{\n"); 
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+	sprintf_safe(szTemp, 200, "\tConnPool::GetInstance()->InitConnPool(\"localhost\",\"mysql\",\"block2\",100,20);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	for(int i = 0; i < (int)obj_PoolTest_Group.m_vec_PoolTest_Info.size(); i++)
 	{
 		sprintf_safe(szTemp, 200, "\tcheck_%s();\n",
-			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_ClassName);
+			obj_PoolTest_Group.m_vec_PoolTest_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 
@@ -303,11 +471,162 @@ bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group)
 	return true;
 }
 
-bool CreatePool_Test(_PoolTest_Group& obj_PoolTest_Group)
+bool Create_Class_Pool_Test_Makefile(_XML_Proc& obj_XML_Proc, _PoolTest_Group& obj_PoolTest_Group)
+{
+	char szTemp[1024]     = {'\0'};
+	char szPathFile[200]  = {'\0'};
+
+	//自动生成makefile.define文件
+	sprintf_safe(szPathFile, 200, "%s/Test/Makefile.define", obj_XML_Proc.m_sz_ProcName);
+
+	FILE* pFile = fopen(szPathFile, "wb");
+	if(NULL == pFile)
+	{
+		return false;
+	}
+
+	sprintf_safe(szTemp, 200, "# *****************************\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# predefine\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# *****************************\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "CC = g++\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "AR = ar\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "CFLAGS = -g -O2 -D__LINUX__\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "#set Lua lib path\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "INCLUDES = -I/usr/local/mysql/include -I../DataWrapper -I../DBWrapper -I../MysqlCommon -I../ShareMemory -I../rapidjson\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "LIBS = -L/usr/lib64 -L/usr/lib -L/usr/local/lib64 -L/usr/local/mysql/lib -lmysqlclient\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# *****************************\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# rule\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# *****************************\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# Here are some rules for converting .cpp -> .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".SUFFIXES: .cpp .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".cpp.o:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@$(CC) -fPIC $(CFLAGS) ${INCLUDES} -c -g $*.cpp\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@echo '----- '$*.cpp' is compiled ok! -----'\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# Here are some rules for converting .c -> .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".SUFFIXES: .c .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".c.o:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@$(CC) $(CFLAGS) -c $*.c \n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@echo '----- '$*.c' is compiled ok! -----'\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	fclose(pFile);
+
+	sprintf_safe(szPathFile, 200, "%s/Test/Makefile", obj_XML_Proc.m_sz_ProcName);
+
+	pFile = fopen(szPathFile, "wb");
+	if(NULL == pFile)
+	{
+		return false;
+	}
+
+	sprintf_safe(szTemp, 200, "include Makefile.define\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "PATS = ");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\t../ShareMemory/ShareMemory.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\t../MysqlCommon/conn_pool.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\t../MysqlCommon/mysql_encap.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\t../DBWrapper/DB_Op.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	
+	for(int i = 0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		sprintf_safe(szTemp, 200, "\t../DataWrapper/%s.o \\\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	}
+	
+	sprintf_safe(szTemp, 200, "\t./Test_Pool_Test.o\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "OBJS = ");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\tShareMemory.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\tconn_pool.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\tmysql_encap.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\tDB_Op.o \\\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	for(int i = 0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		sprintf_safe(szTemp, 200, "\t%s.o \\\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	}
+
+	sprintf_safe(szTemp, 200, "\tTest_Pool_Test.o\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "APP_NAME = Test_Pool_Test\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	
+	sprintf_safe(szTemp, 200, "$(APP_NAME):$(PATS)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\t$(CC) -rdynamic -o $(APP_NAME) $(OBJS) $(LIBS)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\trm -rf *.o\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "clean:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\trm -rf *.o $(APP_NAME)\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "cl:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "\trm -rf *.o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	fclose(pFile);
+
+	return true;
+}
+
+bool CreatePool_Test(_XML_Proc& obj_XML_Proc, _PoolTest_Group& obj_PoolTest_Group)
 {
 	Create_Pool_Test_Environment(obj_PoolTest_Group);
 
 	Create_Class_Pool_Test_Cpp(obj_PoolTest_Group);
+
+	Create_Class_Pool_Test_Makefile(obj_XML_Proc, obj_PoolTest_Group);
 
 	return true;
 }

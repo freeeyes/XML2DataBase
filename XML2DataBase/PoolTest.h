@@ -19,6 +19,8 @@ void Create_Pool_Test_Environment(_PoolTest_Group& obj_PoolTest_Group);
 
 bool Create_Class_Pool_Test_Cpp(_PoolTest_Group& obj_PoolTest_Group);
 
-bool CreatePool_Test(_PoolTest_Group& obj_PoolTest_Group);
+bool Create_Class_Pool_Test_Makefile(_XML_Proc& obj_XML_Proc, _PoolTest_Group& obj_PoolTest_Group);
+
+bool CreatePool_Test(_XML_Proc& obj_XML_Proc, _PoolTest_Group& obj_PoolTest_Group);
 
 #endif
