@@ -585,12 +585,12 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//加载数据函数
-			sprintf_safe(szTemp, 200, "\tbool load_data();\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, 200, "\tbool load_data();\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			//保存数据函数
-			sprintf_safe(szTemp, 200, "\tbool save_data();\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, 200, "\tbool save_data();\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, 200, "\tbool get_is_create();\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -762,8 +762,8 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 		sprintf_safe(szTemp, 200, "#include \"%s.h\"\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-		sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n\n");
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		//sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n\n");
+		//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0)
 		{
@@ -1671,6 +1671,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+			/*
 			sprintf_safe(szTemp, 200, "bool %s_Pool::load_data()\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1698,6 +1699,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			*/
 
 
 			sprintf_safe(szTemp, 200, "bool %s_Pool::get_is_create()\n",
