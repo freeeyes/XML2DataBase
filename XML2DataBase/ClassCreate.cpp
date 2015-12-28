@@ -230,6 +230,13 @@ void Create_Environment(_XML_Proc& obj_XML_Proc)
 #else
 	mkdir(szTempPath, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
 #endif
+
+	//拷贝MD5文件
+	char szTempFile[MAX_BUFF_100] = {'\0'};
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/DataWrapper/MD5.h", obj_XML_Proc.m_sz_ProcName);
+	Tranfile("../MD5.h", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/DataWrapper/MD5.cpp", obj_XML_Proc.m_sz_ProcName);
+	Tranfile("../MD5.cpp", szTempFile);
 }
 
 void Create_Define_H(_Proc_Define_Info& obj_Proc_Define_Info)
@@ -329,11 +336,13 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 		char szHText[MAX_BUFF_50] = {'\0'};
 		To_Upper_String(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name, szHText);
 
-		sprintf_safe(szTemp, 200, "#ifndef _%s_H_\n", szHText);
+		sprintf_safe(szTemp, 200, "#ifndef _%s_H\n", szHText);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "#define _%s_H_\n\n", szHText);
+		sprintf_safe(szTemp, 200, "#define _%s_H\n\n", szHText);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "#include \"Common_Define.h\"\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "#include \"MD5.h\"\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//看看是否要添加序列化的方法
@@ -403,6 +412,10 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 
 		//初始化数据比较函数
 		sprintf_safe(szTemp, 200, "\tbool check_init();\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//MD5函数
+		sprintf_safe(szTemp, 200, "\tvoid get_md5(char* pMD5);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 		//构造get和Set函数
@@ -533,9 +546,40 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 		sprintf_safe(szTemp, 200, "};\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+		sprintf_safe(szTemp, 200, "#endif\n\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		fclose(pFile);
+	}
+
+	//生成对应的pool头文件
+	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
 		//判断是否有Pool需要声明
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
 		{
+			sprintf_safe(szPathFile, 200, "%s/DataWrapper/%s_Pool.h", 
+				obj_XML_Proc.m_sz_ProcName,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+
+			FILE* pFile = fopen(szPathFile, "wb");
+			if(NULL == pFile)
+			{
+				return false;
+			}
+
+			//将类名转换成大写
+			char szHText[MAX_BUFF_50] = {'\0'};
+			To_Upper_String(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name, szHText);
+
+			sprintf_safe(szTemp, 200, "#ifndef _%s_POOL_H\n", szHText);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "#define _%s_POOL_H\n\n", szHText);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			//添加引用基类头文件
+			sprintf_safe(szTemp, 200, "#include \"%s.h\"\n\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			//首先得到key的类型
 			char szKeyType[MAX_BUFF_50] = {'\0'};
 			for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
@@ -732,11 +776,11 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 
 			sprintf_safe(szTemp, 200, "};\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		}
 
-		sprintf_safe(szTemp, 200, "#endif\n\n");
-		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		fclose(pFile);
+			sprintf_safe(szTemp, 200, "#endif\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			fclose(pFile);
+		}
 	}
 
 	return true;
@@ -764,16 +808,6 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 
 		//sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n\n");
 		//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0)
-		{
-			//添加单件初始化
-			sprintf_safe(szTemp, 200, "%s_Pool *%s_Pool::obj_%s_Pool_Instance = NULL;\n",
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
-				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		}
 
 		sprintf_safe(szTemp, 200, "%s::%s()\n", 
 			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name, 
@@ -892,13 +926,27 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, 200, "\t\t\treturn false;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\t}\n");
-				sprintf_safe(szTemp, 200, "\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				sprintf_safe(szTemp, 200, "\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
 		}
 
 		sprintf_safe(szTemp, 200, "\treturn true;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "}\n\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//MD5函数
+		sprintf_safe(szTemp, 200, "void %s::get_md5(char* pMD5)\n",
+			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\tCMD5 objMD5;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\tobjMD5.ENCODE_DATA((char* )this, sizeof(%s), pMD5);\n",
+			obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1343,11 +1391,43 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			fclose(pFile);
 		}
+	}
 
+
+	//生成对应Pool代码
+	for(int i = 0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
 		//判断是否有Pool需要声明
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
 		{
+			sprintf_safe(szPathFile, 200, "%s/DataWrapper/%s_Pool.cpp", 
+				obj_XML_Proc.m_sz_ProcName,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+
+			FILE* pFile = fopen(szPathFile, "wb");
+			if(NULL == pFile)
+			{
+				return false;
+			}
+
+			sprintf_safe(szTemp, 200, "#include \"%s_Pool.h\"\n\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			//sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0)
+			{
+				//添加单件初始化
+				sprintf_safe(szTemp, 200, "%s_Pool *%s_Pool::obj_%s_Pool_Instance = NULL;\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
 			//首先得到key的类型
 			char szKeyType[MAX_BUFF_50] = {'\0'};
 			for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
@@ -1931,9 +2011,8 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);	
 
+			fclose(pFile);
 		}
-
-		fclose(pFile);
 	}
 
 	return true;

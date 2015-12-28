@@ -75,17 +75,19 @@ void Create_DB_Environment(_XML_Proc& obj_XML_Proc)
 #endif
 
 	//拷贝指定文件到目录中去
-	//char szTempFile[MAX_BUFF_100] = {'\0'};
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
-	//Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
-	//Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
-	//Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
-	//Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
-	//sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
-	//Tranfile("../MysqlCommon/lock.h", szTempFile);
+	char szTempFile[MAX_BUFF_100] = {'\0'};
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.h", szTempPath);
+	Tranfile("../MysqlCommon/conn_pool.h", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/conn_pool.cpp", szTempPath);
+	Tranfile("../MysqlCommon/conn_pool.cpp", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.h", szTempPath);
+	Tranfile("../MysqlCommon/mysql_encap.h", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/mysql_encap.cpp", szTempPath);
+	Tranfile("../MysqlCommon/mysql_encap.cpp", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/lock.h", szTempPath);
+	Tranfile("../MysqlCommon/lock.h", szTempFile);
+
+	//创建数据库脚本目录
 	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBScript", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
