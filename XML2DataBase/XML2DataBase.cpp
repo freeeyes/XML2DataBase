@@ -117,8 +117,10 @@ int main(int argc, char* argv[])
 
 	//CreatePool_Test(obj_XML_Proc, obj_PoolTest_Group);
 
+	_DB_Server_Info obj_DB_Server_Info;
+	obj_XmlOpeation.Parse_XML_DB_Server_File((char* )"DBServer.xml", obj_DB_Server_Info);
 	Create_DBServer_Environment(obj_XML_Proc);
-	Create_DB_Server_Class_CPP(obj_XML_Proc);
+	Create_DB_Server_Main_CPP(obj_XML_Proc);
 
 	//getchar();
 	return 0;

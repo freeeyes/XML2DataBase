@@ -4,10 +4,11 @@
 <!-- 在这里定义生成相关的测试Pool的相关代码 -->
 <!-- 自动生成增删 测试代码，并自动生成测试结果 -->
 <configer ProcName="DBTest" DB="mysql">
-	<PoolTest class="CUserData" desc="">
-		<Column name="ID" classtype="int" value="1" iskey="1" />
-		<Column name="Nick" classtype="char" length="20" value="freeeyes" />
-		<Column name="Job" classtype="int" value="1" />
-		<Column name="Ablity" classtype="int" value="1" />
+	<PoolTest database="db_test" table="tb_userdata" class="CUserData" desc="">
+		<Column name="id" classtype="int" value="1" iskey="1" />
+		<Column name="nick" classtype="char" length="20" value="freeeyes" />
+		<Column name="job" classtype="int" value="1" />
+		<Column name="ablity" classtype="int" value="1" />
+		<Column name="activetime" classtype="char" length="20" value="2015-12-11 16:55:52" />
 	</PoolTest>
 </configer>

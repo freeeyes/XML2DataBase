@@ -29,6 +29,7 @@ public:
   bool Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XML_Proc);
   bool Parse_XML_Table_Files(vec_Xml_File_Name obj_vec_Xml_File_Name, _XML_Proc& obj_XML_Proc);
   bool Parse_XML_Test_Pool(char* pFileName, _PoolTest_Group& obj_PoolTest_Group);
+  bool Parse_XML_DB_Server_File(char* pFileName, _DB_Server_Info& obj_DB_Server_Info);
 
   void Close();
 

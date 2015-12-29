@@ -17,6 +17,10 @@ using namespace std;
 
 void Create_DBServer_Environment(_XML_Proc& obj_XML_Proc);
 
-bool Create_DB_Server_Class_CPP(_XML_Proc& obj_XML_Proc);
+bool Create_DB_Server_Main_CPP(_XML_Proc& obj_XML_Proc);
+
+bool Create_DB_Server_Pool_H(_XML_Proc& obj_XML_Proc);
+
+bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc);
 
 #endif

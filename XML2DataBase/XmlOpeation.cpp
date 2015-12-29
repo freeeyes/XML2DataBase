@@ -480,5 +480,76 @@ bool CXmlOpeation::Parse_XML_Test_Pool(char* pFileName, _PoolTest_Group& obj_Poo
 		}
 	}
 
+	delete m_pTiXmlDocument;
+	m_pTiXmlDocument = NULL;
 	return true;
 }
+
+bool CXmlOpeation::Parse_XML_DB_Server_File(char* pFileName, _DB_Server_Info& obj_DB_Server_Info)
+{
+	Close();
+	m_pTiXmlDocument = new TiXmlDocument(pFileName);
+	if(NULL == m_pTiXmlDocument)
+	{
+		return false;
+	}
+
+	if(false == m_pTiXmlDocument->LoadFile())
+	{
+		return false;
+	}
+
+	TiXmlNode* pMainNode     = NULL;
+	TiXmlNode* pColumnNode   = NULL;
+
+	//获得根元素
+	m_pRootElement = m_pTiXmlDocument->RootElement();
+
+	if(NULL == m_pRootElement)
+	{
+		return false;
+	}
+
+	//获得工程名称
+	sprintf_safe(obj_DB_Server_Info.m_sz_ProcName, MAX_BUFF_50, "%s", (char* )m_pRootElement->Attribute("ProcName"));
+
+	TiXmlElement* pDBServerElement = m_pRootElement->FirstChildElement("DBServer");
+	if(NULL != pDBServerElement)
+	{
+		TiXmlElement* pIntervalElement = pDBServerElement->FirstChildElement("Interval");
+		if(NULL != pIntervalElement)
+		{
+			if(NULL != pIntervalElement->Attribute("time"))
+			{
+				obj_DB_Server_Info.m_DB_Server_Run_Info.m_n_Interval = atoi(pIntervalElement->Attribute("time"));
+			}
+		}
+
+		TiXmlElement* pConfigElement = pDBServerElement->FirstChildElement("DBConfig");
+		if(NULL != pConfigElement)
+		{
+			if(NULL != pConfigElement->Attribute("IP"))
+			{
+				sprintf_safe(obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_IP, MAX_BUFF_50, "%s", (char* )pConfigElement->Attribute("IP"));
+			}
+			if(NULL != pConfigElement->Attribute("DBName"))
+			{
+				sprintf_safe(obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_Name, MAX_BUFF_50, "%s", (char* )pConfigElement->Attribute("DBName"));
+			}
+			if(NULL != pConfigElement->Attribute("User"))
+			{
+				sprintf_safe(obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_User, MAX_BUFF_50, "%s", (char* )pConfigElement->Attribute("User"));
+			}
+			if(NULL != pConfigElement->Attribute("Pass"))
+			{
+				sprintf_safe(obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_Pass, MAX_BUFF_50, "%s", (char* )pConfigElement->Attribute("Pass"));
+			}
+		}
+
+	}
+
+	delete m_pTiXmlDocument;
+	m_pTiXmlDocument = NULL;
+	return true;
+}
+

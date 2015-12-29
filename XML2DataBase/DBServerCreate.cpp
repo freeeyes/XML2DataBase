@@ -10,9 +10,30 @@ void Create_DBServer_Environment(_XML_Proc& obj_XML_Proc)
 #else
 	mkdir(szTempPath, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH);
 #endif
+
+	//拷贝创建INI文件
+	char szTempFile[MAX_BUFF_100] = {'\0'};
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/dictionary.h", obj_XML_Proc.m_sz_ProcName);
+	Tranfile("../IniFile/dictionary.h", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/dictionary.c", obj_XML_Proc.m_sz_ProcName);
+	Tranfile("../IniFile/dictionary.c", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/iniparser.h", obj_XML_Proc.m_sz_ProcName);
+	Tranfile("../IniFile/iniparser.h", szTempFile);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/iniparser.c", obj_XML_Proc.m_sz_ProcName);
+	Tranfile("../IniFile/iniparser.c", szTempFile);
 }
 
-bool Create_DB_Server_Class_CPP(_XML_Proc& obj_XML_Proc)
+bool Create_DB_Server_Pool_H(_XML_Proc& obj_XML_Proc)
+{
+	return true;
+}
+
+bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
+{
+	return true;
+}
+
+bool Create_DB_Server_Main_CPP(_XML_Proc& obj_XML_Proc)
 {
 	char szTemp[1024]     = {'\0'};
 	char szPathFile[200]  = {'\0'};

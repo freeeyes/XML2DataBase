@@ -208,7 +208,6 @@ struct _XML_Proc
 };
 
 //**************************************************
-
 //对象池测试相关类型
 struct _PoolTest_Column
 {
@@ -252,6 +251,47 @@ struct _PoolTest_Group
 	vec_PoolTest_Info m_vec_PoolTest_Info;
 
 	_PoolTest_Group()
+	{
+		m_sz_ProcName[0] = '\0';
+	}
+};
+
+//**************************************************
+//DBServer相关自动代码生成
+
+struct _DB_Server_Config
+{
+	char m_sz_DB_IP[MAX_BUFF_50];
+	char m_sz_DB_Name[MAX_BUFF_50];
+	char m_sz_DB_User[MAX_BUFF_50];
+	char m_sz_DB_Pass[MAX_BUFF_50];
+
+	_DB_Server_Config()
+	{
+		m_sz_DB_IP[0]   = '\0';
+		m_sz_DB_Name[0] = '\0';
+		m_sz_DB_User[0] = '\0';
+		m_sz_DB_Pass[0] = '\0';
+	}
+};
+
+struct _DB_Server_Run_Info
+{
+	int m_n_Interval;
+
+	_DB_Server_Run_Info()
+	{
+		m_n_Interval = 300;
+	}
+};
+
+struct _DB_Server_Info
+{
+	char                m_sz_ProcName[MAX_BUFF_50];
+	_DB_Server_Run_Info m_DB_Server_Run_Info;
+	_DB_Server_Config   m_DB_Server_Config; 
+
+	_DB_Server_Info()
 	{
 		m_sz_ProcName[0] = '\0';
 	}

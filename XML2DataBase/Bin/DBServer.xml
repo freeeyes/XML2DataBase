@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<!-- 根据此配置文件自动生成相关DBServer代码 -->
+<configer ProcName="DBTest">
+	<DBServer>         
+		<!-- DBServer存储间隔 -->
+		<Interval time="300" />
+		<!-- 数据库配置文件 -->
+		<DBConfig IP="127.0.0.1" DBName="Test" User="freeeyes" Pass="111111" />
+	</DBServer>
+</configer>
