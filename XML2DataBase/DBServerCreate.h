@@ -43,6 +43,10 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc);
 
 bool Create_DB_Server_Ini_File(_DB_Server_Info& obj_DB_Server_Info);
 
+bool Create_Make_File_Define(_XML_Proc& obj_XML_Proc);
+
+bool Create_Make_File(_XML_Proc& obj_XML_Proc);
+
 void Create_DB_Server(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& obj_XML_Proc);
 
 #endif

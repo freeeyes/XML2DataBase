@@ -737,6 +737,143 @@ bool Create_DB_Server_Ini_File(_DB_Server_Info& obj_DB_Server_Info)
 	return true;
 }
 
+bool Create_Make_File_Define(_XML_Proc& obj_XML_Proc)
+{
+	char szTemp[1024]     = {'\0'};
+	char szPathFile[200]  = {'\0'};
+
+	//自动生成makefile.define文件
+	sprintf_safe(szPathFile, 200, "%s/DBServer/Makefile.define", 
+		obj_XML_Proc.m_sz_ProcName);
+
+	FILE* pFile = fopen(szPathFile, "wb");
+	if(NULL == pFile)
+	{
+		return false;
+	}
+
+	sprintf_safe(szTemp, 200, "# *****************************\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# predefine\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# *****************************\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "CC = g++\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "AR = ar\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "CFLAGS = -g -O2 -D__LINUX__\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "#set Lua lib path\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "INCLUDES = -I./ -I../ -I/usr/include  -I../DataWrapper -I../DBWrapper\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "LIBS = -L/usr/lib64 -L/usr/lib -L/usr/local/lib64 -L./ -L./Lib  -L../ -ldl -lrt -lmysql\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# *****************************\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# rule\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# *****************************\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# Here are some rules for converting .cpp -> .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".SUFFIXES: .cpp .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".cpp.o:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@$(CC) -fPIC $(CFLAGS) ${INCLUDES} -c -g $*.cpp\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@echo '----- '$*.cpp' is compiled ok! -----'\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "# Here are some rules for converting .c -> .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".SUFFIXES: .c .o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, ".c.o:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@$(CC) $(CFLAGS) -c $*.c \n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t@echo '----- '$*.c' is compiled ok! -----'\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	fclose(pFile);
+
+	return true;
+}
+
+bool Create_Make_File(_XML_Proc& obj_XML_Proc)
+{
+	char szTemp[1024]     = {'\0'};
+	char szPathFile[200]  = {'\0'};
+
+	//自动生成makefile文件
+	sprintf_safe(szPathFile, 200, "%s/DBServer/Makefile", 
+		obj_XML_Proc.m_sz_ProcName);
+
+	FILE* pFile = fopen(szPathFile, "wb");
+	if(NULL == pFile)
+	{
+		return false;
+	}
+
+	sprintf_safe(szTemp, 200, "include Makefile.define\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "PATS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o ../DBWrapper/DB_Op.o \\ \n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		//判断是否有Pool需要声明
+		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
+		{
+			sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s_Pool.o ../DataWrapper/%s.o\\ \n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+	}
+	sprintf_safe(szTemp, 200, "\t\t../DBWrapper/DB_Op.o ../DBWrapper/conn_pool.o ../DBWrapper/mysql_encap.o \n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "OBJS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o DB_Op.o \\ \n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		//判断是否有Pool需要声明
+		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
+		{
+			sprintf_safe(szTemp, 200, "\t\t%s_Pool.o %s.o\\ \n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+	}
+	sprintf_safe(szTemp, 200, "\t\tDB_Op.o conn_pool.o mysql_encap.o \n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "APP_NAME = %s\n\n", obj_XML_Proc.m_sz_ProcName);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "$(APP_NAME):$(PATS)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t$(CC) -rdynamic -o $(APP_NAME) $(OBJS) $(LIBS)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\trm -rf *.o\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "clean:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\trm -rf *.o $(APP_NAME):\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "cl:\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\trm -rf *.o\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	fclose(pFile);
+
+	return true;
+}
+
 void Create_DB_Server(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& obj_XML_Proc)
 {
 	Create_DBServer_Environment(obj_XML_Proc);
@@ -748,4 +885,8 @@ void Create_DB_Server(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& obj_XML_Pr
 	Create_DB_Server_Pool_H(obj_XML_Proc);
 
 	Create_DB_Server_Pool_CPP(obj_XML_Proc);
+
+	Create_Make_File_Define(obj_XML_Proc);
+
+	Create_Make_File(obj_XML_Proc);
 }
