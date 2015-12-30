@@ -21,12 +21,14 @@ struct _Pool_Info
 	char m_sz_Key_Name[MAX_BUFF_50];
 	char m_sz_Key_Type[MAX_BUFF_50];
 	char m_sz_Class_Name[MAX_BUFF_50];
+	char m_sz_Table_Name[MAX_BUFF_50];
 
 	_Pool_Info()
 	{
 		m_sz_Key_Name[0]   = '\0';
 		m_sz_Key_Type[0]   = '\0';
 		m_sz_Class_Name[0] = '\0';
+		m_sz_Table_Name[0] = '\0';
 	}
 };
 typedef vector<_Pool_Info> Vec_Save_Pool_Info;

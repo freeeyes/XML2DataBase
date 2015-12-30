@@ -4,7 +4,7 @@ void Create_DBServer_Environment(_XML_Proc& obj_XML_Proc)
 {
 	char szTempPath[MAX_BUFF_50]   = {'\0'};
 	//创建DBServer目录
-	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/dbserver", obj_XML_Proc.m_sz_ProcName);
+	sprintf_safe(szTempPath, MAX_BUFF_50, "%s/DBServer", obj_XML_Proc.m_sz_ProcName);
 #ifdef WIN32
 	_mkdir(szTempPath);
 #else
@@ -21,13 +21,13 @@ void Create_DBServer_Environment(_XML_Proc& obj_XML_Proc)
 
 	//拷贝创建INI文件
 	char szTempFile[MAX_BUFF_100] = {'\0'};
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/dictionary.h", obj_XML_Proc.m_sz_ProcName);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/DBServer/dictionary.h", obj_XML_Proc.m_sz_ProcName);
 	Tranfile("../IniFile/dictionary.h", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/dictionary.c", obj_XML_Proc.m_sz_ProcName);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/DBServer/dictionary.c", obj_XML_Proc.m_sz_ProcName);
 	Tranfile("../IniFile/dictionary.c", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/iniparser.h", obj_XML_Proc.m_sz_ProcName);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/DBServer/iniparser.h", obj_XML_Proc.m_sz_ProcName);
 	Tranfile("../IniFile/iniparser.h", szTempFile);
-	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/dbserver/iniparser.c", obj_XML_Proc.m_sz_ProcName);
+	sprintf_safe(szTempFile, MAX_BUFF_100, "%s/DBServer/iniparser.c", obj_XML_Proc.m_sz_ProcName);
 	Tranfile("../IniFile/iniparser.c", szTempFile);
 }
 
@@ -36,7 +36,7 @@ bool Create_DB_Server_Pool_H(_XML_Proc& obj_XML_Proc)
 	char szTemp[1024]     = {'\0'};
 	char szPathFile[200]  = {'\0'};
 
-	sprintf_safe(szPathFile, 200, "%s/dbserver/DB_Pool_Save.h", 
+	sprintf_safe(szPathFile, 200, "%s/DBServer/DB_Pool_Save.h", 
 		obj_XML_Proc.m_sz_ProcName);
 
 	FILE* pFile = fopen(szPathFile, "wb");
@@ -48,6 +48,8 @@ bool Create_DB_Server_Pool_H(_XML_Proc& obj_XML_Proc)
 	sprintf_safe(szTemp, 200, "#ifndef DB_POOL_SAVE_H\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#define DB_POOL_SAVE_H\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include <string>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include <map>\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -135,7 +137,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 	char szTemp[1024]     = {'\0'};
 	char szPathFile[200]  = {'\0'};
 
-	sprintf_safe(szPathFile, 200, "%s/dbserver/DB_Pool_Save.cpp", 
+	sprintf_safe(szPathFile, 200, "%s/DBServer/DB_Pool_Save.cpp", 
 		obj_XML_Proc.m_sz_ProcName);
 
 	FILE* pFile = fopen(szPathFile, "wb");
@@ -144,7 +146,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		return false;
 	}
 
-	sprintf_safe(szTemp, 200, "#include \"DB_Pool_Save.h\"");
+	sprintf_safe(szTemp, 200, "#include \"DB_Pool_Save.h\"\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	Vec_Save_Pool_Info obj_Vec_Save_Pool_Info;
@@ -163,6 +165,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 					sprintf_safe(obj_Pool_Info.m_sz_Key_Name, MAX_BUFF_50, "%s", obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					sprintf_safe(obj_Pool_Info.m_sz_Key_Type, MAX_BUFF_50, "%s", obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
 					sprintf_safe(obj_Pool_Info.m_sz_Class_Name, MAX_BUFF_50, "%s", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+					sprintf_safe(obj_Pool_Info.m_sz_Table_Name, MAX_BUFF_50, "%s", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
 					break;
 				}
 			}
@@ -180,10 +183,89 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < (int)%s_Pool::instance()->get_used_count(); i++)\n", 
+		sprintf_safe(szTemp, 200, "\tvec_Key_%s_List obj_vec_Key_%s_List;\n", 
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t%s_Pool::instance()->get_used_key_list(obj_vec_Key_%s_List);\n", 
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < (int)obj_vec_Key_%s_List.size(); i++)\n", 
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\tobj_%s = obj_vec_Key_%s_List[i];\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t%s* pData = %s_Pool::instance()->get_used_object(obj_%s);\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\tif(NULL != pData)\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\tmap_%s_Pool::iterator f = g_map_%s_Pool.find(obj_%s);\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\tif(f != g_map_%s_Pool.end())\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t{\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tstring strOldMD5 = (string)f->second();\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tstring strCurrMD5;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tchar szCurrMD5[50] = {'\\0'};\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tpData->get_md5(szCurrMD5);\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tstrCurrMD5 = (string)szCurrMD5;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tif(strCurrMD5 == strOldMD5)\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\t{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\t\tcontinue;\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\t}\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tupdate_%s(&pData);\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Table_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tg_map_%s_Pool[obj_%s] = strCurrMD5;\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t}\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\telse\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tupdate_%s(&pData);\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Table_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tchar szCurrMD5[50] = {'\\0'};\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tpData->get_md5(szCurrMD5);\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t\tg_map_%s_Pool.insert(map_%s_Pool::value_type(obj_%s, (string)szCurrMD5);\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
+			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t\t}\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\t}\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t}\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -200,7 +282,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	char szTemp[1024]     = {'\0'};
 	char szPathFile[200]  = {'\0'};
 
-	sprintf_safe(szPathFile, 200, "%s/dbserver/DB_Server.cpp", 
+	sprintf_safe(szPathFile, 200, "%s/DBServer/DB_Server.cpp", 
 		obj_XML_Proc.m_sz_ProcName);
 
 	FILE* pFile = fopen(szPathFile, "wb");
@@ -234,6 +316,8 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	sprintf_safe(szTemp, 200, "#include \"iniparser.h\"\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include \"DBWrapper/DB_Op.h\"\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include \"DB_Pool_Save.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	sprintf_safe(szTemp, 200, "int AcquireWriteLock(int fd, int start, int len)\n");
@@ -349,6 +433,17 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t//add your db save code\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	//查找需要用到的Pool
+	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
+	{
+		//判断是否有Pool需要声明
+		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
+		{
+			sprintf_safe(szTemp, 200, "\t\tSave_%s_Pool_Proc();\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		}
+	}
 	//这里添加数据库入库代码
 	sprintf_safe(szTemp, 200, "\t\tnanosleep(&tsSleep, NULL);\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -487,6 +582,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	sprintf_safe(szTemp, 200, "}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+	//主程序
 	sprintf_safe(szTemp, 200, "int main(int argc, char *argv[])\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
