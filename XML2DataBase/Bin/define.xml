@@ -10,6 +10,5 @@
 	<enum name="ItemType">
 		<Info name="STRONGE" />
 		<Info name="AGILE" />
-		<Info name="AGILE" />
 	</enum>
 </configer>

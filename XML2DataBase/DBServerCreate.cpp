@@ -98,7 +98,7 @@ bool Create_DB_Server_Pool_H(_XML_Proc& obj_XML_Proc)
 	for(int i = 0; i < (int)obj_Vec_Save_Pool_Info.size(); i++)
 	{
 		//添加头文件
-		sprintf_safe(szTemp, 200, "typedef map<%s, string> map_%s_Pool",
+		sprintf_safe(szTemp, 200, "typedef map<%s, string> map_%s_Pool;",
 			obj_Vec_Save_Pool_Info[i].m_sz_Key_Type,
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -178,7 +178,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 	for(int i = 0; i < (int)obj_Vec_Save_Pool_Info.size(); i++)
 	{
 		//添加头文件
-		sprintf_safe(szTemp, 200, "void Save_%s_Pool_Proc();\n",
+		sprintf_safe(szTemp, 200, "void Save_%s_Pool_Proc()\n",
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "{\n");
@@ -187,7 +187,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t%s_Pool::instance()->get_used_key_list(obj_vec_Key_%s_List);\n", 
+		sprintf_safe(szTemp, 200, "\t%s_Pool::getInstance()->get_used_key_list(obj_vec_Key_%s_List);\n", 
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -196,11 +196,12 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\tobj_%s = obj_vec_Key_%s_List[i];\n",
+		sprintf_safe(szTemp, 200, "\t\t%s obj_%s = obj_vec_Key_%s_List[i];\n",
+			obj_Vec_Save_Pool_Info[i].m_sz_Key_Type,
 			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name,
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\t%s* pData = %s_Pool::instance()->get_used_object(obj_%s);\n",
+		sprintf_safe(szTemp, 200, "\t\t%s* pData = %s_Pool::getInstance()->get_used_object(obj_%s);\n",
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
 			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name);
@@ -220,7 +221,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		sprintf_safe(szTemp, 200, "\t\t\t{\n",
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\t\t\tstring strOldMD5 = (string)f->second();\n");
+		sprintf_safe(szTemp, 200, "\t\t\t\tstring strOldMD5 = (string)f->second;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\t\tstring strCurrMD5;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -238,7 +239,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\t\t}\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\t\t\tupdate_%s(&pData);\n",
+		sprintf_safe(szTemp, 200, "\t\t\t\tupdate_%s(*pData);\n",
 			obj_Vec_Save_Pool_Info[i].m_sz_Table_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\t\tg_map_%s_Pool[obj_%s] = strCurrMD5;\n",
@@ -251,14 +252,14 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\t{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\t\t\tupdate_%s(&pData);\n",
+		sprintf_safe(szTemp, 200, "\t\t\t\tupdate_%s(*pData);\n",
 			obj_Vec_Save_Pool_Info[i].m_sz_Table_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\t\tchar szCurrMD5[50] = {'\\0'};\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\t\tpData->get_md5(szCurrMD5);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\t\t\tg_map_%s_Pool.insert(map_%s_Pool::value_type(obj_%s, (string)szCurrMD5);\n",
+		sprintf_safe(szTemp, 200, "\t\t\t\tg_map_%s_Pool.insert(map_%s_Pool::value_type(obj_%s, (string)szCurrMD5));\n",
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name,
 			obj_Vec_Save_Pool_Info[i].m_sz_Key_Name);
@@ -400,9 +401,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\treturn 1;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t}\n\n");
-	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "}\n");
+	sprintf_safe(szTemp, 200, "\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\telse if (arg.l_type == F_WRLCK)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -471,7 +470,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\tperror(\"[Gdaemon]setpgrp failure\");\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t\tperror(\"exit(1);\n");
+	sprintf_safe(szTemp, 200, "\t\texit(1);\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -483,7 +482,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\tperror(\"[Gdaemon]fork failure\");\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t\tperror(\"exit(1);\n");
+	sprintf_safe(szTemp, 200, "\t\texit(1);\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -527,13 +526,13 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tchar sz_DB_IP[50] = {'\\0'}\n");
+	sprintf_safe(szTemp, 200, "\tchar sz_DB_IP[50] = {'\\0'};\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tchar sz_DB_Name[50] = {'\\0'}\n");
+	sprintf_safe(szTemp, 200, "\tchar sz_DB_Name[50] = {'\\0'};\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tchar sz_DB_User[50] = {'\\0'}\n");
+	sprintf_safe(szTemp, 200, "\tchar sz_DB_User[50] = {'\\0'};\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tchar sz_DB_Pass[50] = {'\\0'}\n");
+	sprintf_safe(szTemp, 200, "\tchar sz_DB_Pass[50] = {'\\0'};\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tchar* pData = iniparser_getstring(pDictionary, \"DBConfig:DBIP\", NULL);\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -601,7 +600,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tGdaemon();\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tchar szFileName[200] = {'\0'};\n");
+	sprintf_safe(szTemp, 200, "\tchar szFileName[200] = {'\\0'};\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tmemset(szFileName, 0, sizeof(flock));\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -768,9 +767,9 @@ bool Create_Make_File_Define(_XML_Proc& obj_XML_Proc)
 
 	sprintf_safe(szTemp, 200, "#set Lua lib path\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "INCLUDES = -I./ -I../ -I/usr/include  -I../DataWrapper -I../DBWrapper\n");
+	sprintf_safe(szTemp, 200, "INCLUDES = -I./ -I../ -I/usr/include  -I../DataWrapper -I../DBWrapper -I../rapidjson -I../ShareMemory -I/usr/local/mysql/include \n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "LIBS = -L/usr/lib64 -L/usr/lib -L/usr/local/lib64 -L./ -L./Lib  -L../ -ldl -lrt -lmysql\n\n");
+	sprintf_safe(szTemp, 200, "LIBS = -L/usr/lib64 -L/usr/lib -L/usr/local/lib64 -L./ -L./Lib  -L../ -L/usr/local/mysql/lib -lmysqlclient -ldl -lrt \n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "# *****************************\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -820,14 +819,14 @@ bool Create_Make_File(_XML_Proc& obj_XML_Proc)
 
 	sprintf_safe(szTemp, 200, "include Makefile.define\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "PATS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o ../DBWrapper/DB_Op.o \\ \n");
+	sprintf_safe(szTemp, 200, "PATS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o ../DBWrapper/DB_Op.o \\\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
 	{
 		//判断是否有Pool需要声明
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
 		{
-			sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s_Pool.o ../DataWrapper/%s.o\\ \n",
+			sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s_Pool.o ../DataWrapper/%s.o \\\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -836,14 +835,14 @@ bool Create_Make_File(_XML_Proc& obj_XML_Proc)
 	sprintf_safe(szTemp, 200, "\t\t../DBWrapper/DB_Op.o ../DBWrapper/conn_pool.o ../DBWrapper/mysql_encap.o \n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	sprintf_safe(szTemp, 200, "OBJS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o DB_Op.o \\ \n");
+	sprintf_safe(szTemp, 200, "OBJS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o DB_Op.o \\\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
 	{
 		//判断是否有Pool需要声明
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
 		{
-			sprintf_safe(szTemp, 200, "\t\t%s_Pool.o %s.o\\ \n",
+			sprintf_safe(szTemp, 200, "\t\t%s_Pool.o %s.o \\\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

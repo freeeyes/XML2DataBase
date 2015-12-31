@@ -19,19 +19,19 @@ void Copy_Json_File(string folderPath, string newfolderPath)
 			//这个语句很重要
 			if( (strcmp(FileInfo.name,".") != 0 ) &&(strcmp(FileInfo.name,"..") != 0))   
 			{
-				string newfolderPath = folderPath + "\\" + FileInfo.name;
-				string newjosnPath = newfolderPath + "\\" + FileInfo.name;
+				string subfolderPath = folderPath + "/" + FileInfo.name;
+				string newjosnPath = newfolderPath + "/" + FileInfo.name;
 
 				//创建新的映射目录
 				_mkdir(newjosnPath.c_str());
 
-				Copy_Json_File(newfolderPath, newjosnPath);
+				Copy_Json_File(subfolderPath, newjosnPath);
 			}
 		}
 		else  
 		{
-			string filename     = folderPath + "\\" + FileInfo.name;
-			string jsonfilename = newfolderPath + "\\" + FileInfo.name;
+			string filename     = folderPath + "/" + FileInfo.name;
+			string jsonfilename = newfolderPath + "/" + FileInfo.name;
 			//开始拷贝文件
 			Tranfile(filename.c_str(), jsonfilename.c_str());
 		}
@@ -607,7 +607,7 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "typedef vec<%s> vec_Key_%s_List;\n\n", 
+			sprintf_safe(szTemp, 200, "typedef vector<%s> vec_Key_%s_List;\n\n", 
 				szKeyType,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

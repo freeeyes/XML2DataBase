@@ -142,7 +142,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "SELECT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool select_%s(%s& obj);\n", 
+			sprintf_safe(szTemp, 200, "bool select_%s(%s obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -150,7 +150,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "INSERT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool insert_%s(%s& obj);\n", 
+			sprintf_safe(szTemp, 200, "bool insert_%s(%s obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -158,7 +158,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "UPDATE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool update_%s(%s& obj);\n", 
+			sprintf_safe(szTemp, 200, "bool update_%s(%s obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -166,7 +166,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "DELETE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool delete_%s(%s& obj);\n", 
+			sprintf_safe(szTemp, 200, "bool delete_%s(%s obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -272,7 +272,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "SELECT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool select_%s(%s& obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool select_%s(%s obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -454,7 +454,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "INSERT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool insert_%s(%s& obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool insert_%s(%s obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -605,7 +605,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "UPDATE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool update_%s(%s& obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool update_%s(%s obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -759,7 +759,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "DELETE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool delete_%s(%s& obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool delete_%s(%s obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
