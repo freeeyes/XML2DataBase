@@ -2,7 +2,7 @@
 
 <!-- add by freeeyes -->
 <configer ProcName="DBTest" DB="mysql">
-  	<TableClass database="db_test"class="CUserGrid" SerialType="json" desc="">
+  	<TableClass database="db_test"class="CUserGrid" desc="">
 		<!-- 格子内的对象ID，如果没有则是0 -->
 		<Column name="GridID" dbtype="int" classtype="int" value="0" />
 		<!-- 格子中的物品类型，如果没有则是0 -->
@@ -13,7 +13,7 @@
 		<Column name="GridCount" dbtype="int" classtype="int" value="0" />
 	</TableClass>  
   
- 	<TableClass database="db_test" class="CUserGridList" SerialType="json" desc="">
+ 	<TableClass database="db_test" class="CUserGridList" desc="">
 		<!-- GridID 一般与之匹配的是UserID 默认是0-->
 		<Column name="GridID" dbtype="int" classtype="int" value="" />
 		<!-- 一个List对象，最多有20个格子 -->

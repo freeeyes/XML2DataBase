@@ -2,7 +2,7 @@
 
 <!-- add by freeeyes -->
 <configer ProcName="DBTest" DB="mysql">
-	<TableClass database="db_test" table="tb_BossAward" class="CBossAward" classpool="" func="">
+	<TableClass database="db_test" table="tb_BossAward" class="CBossAward" func="">
 		<Column name="bossid" dbtype="int" classtype="int" value="0" />
 		<Column name="bosslevel" dbtype="int" classtype="int" value="0" />
 		<Column name="awardid" dbtype="int" classtype="int" value="0" />
