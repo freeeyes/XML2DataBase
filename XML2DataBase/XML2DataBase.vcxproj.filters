@@ -48,6 +48,9 @@
     <ClInclude Include="DBServerCreate.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ClassCreatePool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="XML2DataBase.cpp">
@@ -81,6 +84,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DBServerCreate.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassCreatePool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

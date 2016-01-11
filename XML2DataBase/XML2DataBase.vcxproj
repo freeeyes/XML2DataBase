@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClassCreate.h" />
+    <ClInclude Include="ClassCreatePool.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="DBOperationCreate.h" />
     <ClInclude Include="DBServerCreate.h" />
@@ -95,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClassCreate.cpp" />
+    <ClCompile Include="ClassCreatePool.cpp" />
     <ClCompile Include="DBOperationCreate.cpp" />
     <ClCompile Include="DBServerCreate.cpp" />
     <ClCompile Include="PoolTest.cpp" />

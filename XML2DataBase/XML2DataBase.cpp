@@ -7,6 +7,7 @@
 #include "DBOperationCreate.h"
 #include "PoolTest.h"
 #include "DBServerCreate.h"
+#include "ClassCreatePool.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -109,6 +110,9 @@ int main(int argc, char* argv[])
 	//printf("[Main]vec_Table_Info(%d).\n", obj_XML_Proc.m_obj_vec_Table_Info.size());
 
 	Create_Proc(obj_Proc_Define_Info, obj_XML_Proc);
+
+	Create_Pool_Proc(obj_XML_Proc);
+
 	Create_DB_Proc(obj_XML_Proc);
 
 	//Éú³É²âÊÔ³Ø´úÂë
