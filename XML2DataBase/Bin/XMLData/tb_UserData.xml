@@ -35,7 +35,7 @@
 		<!-- 最后更新时间，这个字段由update的时候，自动记录。-->
 		<Column name="activetime" dbtype="date" classtype="int" value="0" />
 		<!-- 用户身上物品格子。用于测试类之间的包含，这部分存储为json到数据库 -->
-		<Column name="usergridlist" dbtype="varchar" classtype="CUserGridList" length="2"/>
+		<Column name="usergridlist" dbtype="varchar" classtype="CUserGridList"/>
 	</TableClass>
 
 	<TableExt database="db_test" table="tb_userdata" class="CUserData" >
