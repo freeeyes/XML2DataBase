@@ -30,6 +30,12 @@ bool Create_Class_Pool_H(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "#define _%s_POOL_H\n\n", szHText);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+			sprintf_safe(szTemp, 200, "#include \"Lru.h\"\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "#include \"DB_Op.h\"\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			//添加引用基类头文件
 			sprintf_safe(szTemp, 200, "#include \"%s.h\"\n\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -152,6 +158,14 @@ bool Create_Class_Pool_H(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\tint m_list_Count;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\t%s* m_list_free_%s;\n", 
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tint m_list_free_Count;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			sprintf_safe(szTemp, 200, "\tbool m_bl_Is_Create;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\tsize_t m_st_PoolSize;\n");
@@ -165,6 +179,31 @@ bool Create_Class_Pool_H(_XML_Proc& obj_XML_Proc)
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
+			{
+				for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
+				{
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) == 0)
+					{
+						if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
+						{
+							sprintf_safe(szTemp, 200, "\tLRUCache<%s , %s>* m_lru_cache;\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else
+						{
+							sprintf_safe(szTemp, 200, "\tLRUCache<char* , %s>* m_lru_cache;\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						break;
+					}
+				}
+			}
 
 			//添加单件代码
 			sprintf_safe(szTemp, 200, "private:\n");
@@ -312,11 +351,22 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\tm_lru_cache = NULL;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			sprintf_safe(szTemp, 200, "\tm_list_%s = NULL;\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\tm_list_Count = 0;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\tm_list_free_%s = NULL;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\tm_list_free_Count = 0;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			
 			sprintf_safe(szTemp, 200, "\tm_bl_Is_Create = true;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\tm_st_PoolSize = 0;\n");
@@ -361,6 +411,18 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, 200, "\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
+
+			sprintf_safe(szTemp, 200, "\tif(NULL != m_lru_cache)\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\tdelete m_lru_cache;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\tm_lru_cache = NULL;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t}\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			sprintf_safe(szTemp, 200, "}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -375,8 +437,9 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			//这里判断是否有共享内存标签，如果有填充共享内存代码
 			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
 			{
-				sprintf_safe(szTemp, 200, "\tm_st_PoolSize = sizeof(%s) * %d;\n",
+				sprintf_safe(szTemp, 200, "\tm_st_PoolSize = sizeof(%s) * (%d + %d*2);\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\tm_list_%s = (%s* )Open_Share_Memory_API(%s, m_st_PoolSize, m_obj_shm_id, m_bl_Is_Create);\n",
@@ -387,9 +450,10 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			}
 			else
 			{
-				sprintf_safe(szTemp, 200, "\tm_list_%s = new %s[%d];\n",
+				sprintf_safe(szTemp, 200, "\tm_list_%s = new %s[(%d + %d*2)];\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
@@ -401,10 +465,28 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			sprintf_safe(szTemp, 200, "\t\treturn;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t}\n\n");
+			sprintf_safe(szTemp, 200, "\t}\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\tm_list_Count = %d;\n",
+			sprintf_safe(szTemp, 200, "\telse\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\t{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\t\tm_list_free_%s = m_list_%s + %d;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\t\tm_list_Count = %d;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "\t\tm_list_free_Count = %d * 2;\n",
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\t}\n\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			if (obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_IsDependFunc == 1)
@@ -605,6 +687,34 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				}
 				
+			}
+
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
+			{
+				for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
+				{
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) == 0)
+					{
+						if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
+						{
+							sprintf_safe(szTemp, 200, "\tm_lru_cache = new LRUCache<%s, %s>(m_list_free_%s,%d*2,true);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else
+						{
+							sprintf_safe(szTemp, 200, "\tm_lru_cache = new LRUCache<char*, %s>(m_list_free_%s,%d*2,true);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						break;
+					}
+				}
 			}
 
 			sprintf_safe(szTemp, 200, "}\n\n");
@@ -858,7 +968,7 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, 200, "\t\tobj_vec_Key_%s_List.push_back(pData->m_obj_%s);\n",
+			sprintf_safe(szTemp, 200, "\t\tobj_vec_Key_%s_List.push_back(pData->get_%s());\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

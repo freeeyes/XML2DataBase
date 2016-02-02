@@ -293,16 +293,18 @@ bool CXmlOpeation::Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XM
 			if(NULL != pMainNode->ToElement()->Attribute("isdependfunc"))
 			{
 				obj_Table_Info.m_n_IsDependFunc = atoi(pMainNode->ToElement()->Attribute("isdependfunc"));
-				printf("[Parse_XML_Table_File]isdependfunc:%s\n",pMainNode->ToElement()->Attribute("isdependfunc"));
 			}
 			if(NULL != pMainNode->ToElement()->Attribute("dependclass"))
 			{
 				sprintf_safe(obj_Table_Info.m_sz_DependClass, MAX_BUFF_50, "%s", pMainNode->ToElement()->Attribute("dependclass"));
-				printf("[Parse_XML_Table_File]dependclass:%s\n",pMainNode->ToElement()->Attribute("dependclass"));
 			}
 			if(NULL != pMainNode->ToElement()->Attribute("desc"))
 			{
 				sprintf_safe(obj_Table_Info.m_sz_Desc, MAX_BUFF_100, "%s", pMainNode->ToElement()->Attribute("desc"));
+			}
+			if(NULL != pMainNode->ToElement()->Attribute("needlogicclass"))
+			{
+				obj_Table_Info.m_n_Need_Logic_Class = atoi(pMainNode->ToElement()->Attribute("needlogicclass"));
 			}
 
 			//±éÀúColumnÄÚÈİ

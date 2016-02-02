@@ -142,7 +142,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "SELECT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool select_%s(%s obj);\n", 
+			sprintf_safe(szTemp, 200, "bool select_%s(%s& obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -150,7 +150,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "INSERT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool insert_%s(%s obj);\n", 
+			sprintf_safe(szTemp, 200, "bool insert_%s(%s& obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -158,7 +158,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "UPDATE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool update_%s(%s obj);\n", 
+			sprintf_safe(szTemp, 200, "bool update_%s(%s& obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -166,7 +166,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "DELETE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, 200, "bool delete_%s(%s obj);\n", 
+			sprintf_safe(szTemp, 200, "bool delete_%s(%s& obj);\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -272,7 +272,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "SELECT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool select_%s(%s obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool select_%s(%s& obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -454,7 +454,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "INSERT", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool insert_%s(%s obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool insert_%s(%s& obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -511,18 +511,27 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						//如果是字符串，特殊处理
 						strValue = strValue + "('%s', ";
 					}
-					else
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
 					{
+						//如果是字符串，特殊处理
 						strValue = strValue + "(%d, ";
 					}
-
-					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+					else
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().serialization().c_str(), ";
+						strValue = strValue + "('%s', ";
+					}
+
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					}
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
 					}
 					else
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
 					}
 				}
 				else if (j == (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size() -1 )
@@ -532,18 +541,27 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						//如果是字符串，特殊处理
 						strValue = strValue + "'%s');";
 					}
-					else
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
 					{
+						//如果是字符串，特殊处理
 						strValue = strValue + "%d);";
 					}
-
-					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+					else
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().serialization().c_str()";
+						strValue = strValue + "'%s');";
+					}
+
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
+					}
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
 					}
 					else
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str()";
 					}
 				}
 				else
@@ -553,18 +571,26 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						//如果是字符串，特殊处理
 						strValue = strValue + "'%s', ";
 					}
-					else
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
 					{
 						strValue = strValue + "%d, ";
 					}
-
-					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
+					else
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().serialization().c_str(), ";
+						strValue = strValue + "'%s', ";
+					}
+
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					}
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
 					}
 					else
 					{
-						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
 					}
 				}
 			}
@@ -605,7 +631,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "UPDATE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool update_%s(%s obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool update_%s(%s& obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -641,30 +667,41 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				{
 					continue;
 				}
-
-				if (j == (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size() -1 )
-				{
-					
-					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
-					{
-						//如果是字符串，特殊处理
-						strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "'%s'";
-					}
-					else
-					{
-						strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "%d";
-					}
-				}
 				else
 				{
-					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+					if (j == (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size() -1 )
 					{
-						//如果是字符串，特殊处理
-						strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "'%s'" + ", ";
+						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+						{
+							//如果是字符串，特殊处理
+							strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "'%s'";
+						}
+						else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+						{
+							//如果是字符串，特殊处理
+							strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "%d";
+						}
+						else
+						{
+							strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "'%s'";
+						}
 					}
 					else
 					{
-						strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "%d" + ", ";
+						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+						{
+							//如果是字符串，特殊处理
+							strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "'%s'" + ", ";
+						}
+						else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+						{
+							strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "%d" + ", ";
+						}
+						else
+						{
+							
+							strUpdate = strUpdate + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + " = " + "'%s'" + ", ";
+						}
 					}
 				}
 			}
@@ -676,15 +713,20 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 					continue;
 				}
 				else
-				{
+				{	
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
 					{
 						//如果是字符串，特殊处理
 						strUpdate = strUpdate + " where " + string(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name) + " = " + "'%s';";
 					}
-					else
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
 					{
 						strUpdate = strUpdate + " where " + string(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name) + " = " + "%d;";
+					}
+					else
+					{
+						//如果是字符串，特殊处理
+						strUpdate = strUpdate + " where " + string(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name) + " = " + "'%s';";
 					}
 				}
 			}
@@ -696,14 +738,20 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				{
 					continue;
 				}
-
-				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
-				{
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().serialization().c_str(), ";
-				}
 				else
 				{
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					}
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+					}
+					else
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str(), ";
+					}
 				}
 			}
 
@@ -713,14 +761,20 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				{
 					continue;
 				}
-
-				if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "json") == 0)
-				{
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().serialization().c_str()";
-				}
 				else
 				{
-					strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
+					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
+					}
+					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "int") == 0)
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
+					}
+					else
+					{
+						strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "().c_str()";
+					}
 				}
 			}
 
@@ -759,7 +813,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 		if( strSqlKey.find( "DELETE", 0 ) != string::npos )
 		{
-			sprintf_safe(szTemp, sizeof(szTemp), "bool delete_%s(%s obj)\n", 
+			sprintf_safe(szTemp, sizeof(szTemp), "bool delete_%s(%s& obj)\n", 
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

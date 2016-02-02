@@ -77,10 +77,12 @@ struct _Proc_Define_Info
 struct _Include_Info
 {
 	char m_szInclude[MAX_BUFF_100];
+	int  m_n_Need_Logic_Class;
 
 	_Include_Info()
 	{
 		m_szInclude[0] = '\0';
+		m_n_Need_Logic_Class = 0;
 	}
 };
 typedef vector<_Include_Info> vec_Include_Info;
@@ -122,8 +124,10 @@ struct _Table_Info
 	char m_sz_key[MAX_BUFF_50];
 	char m_sz_ShmKey[MAX_BUFF_50];
 	char m_sz_DependClass[MAX_BUFF_50];
+	char m_sz_Type[MAX_BUFF_50];
 	int  m_n_IsDependFunc;
 	int  m_n_Class_Pool;
+	int  m_n_Need_Logic_Class;
 	vec_Column_Info m_obj_vec_Column_Info;
 
 	_Table_Info()
@@ -137,8 +141,10 @@ struct _Table_Info
 		m_sz_key[0]         	 = '\0';
 		m_sz_ShmKey[0]      	 = '\0';
 		m_sz_DependClass[0] 	 = '\0';
+		m_sz_Type[0] 	         = '\0';
 		m_n_IsDependFunc       	 = 0;
 		m_n_Class_Pool      	 = 0;
+		m_n_Need_Logic_Class     = 0;
 	}
 };
 typedef vector<_Table_Info> vec_Table_Info;

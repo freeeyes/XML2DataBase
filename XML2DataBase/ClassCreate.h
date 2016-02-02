@@ -11,8 +11,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #endif
-#include<iostream>
-#include<fstream>
+#include <iostream>
+#include <fstream>
 using namespace std;
 
 void Copy_ShareMemory_File(string folderPath, string newfolderPath);

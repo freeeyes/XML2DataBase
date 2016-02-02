@@ -4,7 +4,9 @@
 
 #include <exception>
 #include <strstream>
-
+#include <iostream>
+#include <string>
+#include <stdexcept>
 using namespace std;
 
 //CONSTRUCTOR
