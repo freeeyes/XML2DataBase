@@ -9,6 +9,8 @@
 #endif
 using namespace std;
 
+void Check_DB_Include_File(_Table_Info obj_Class_Info, _XML_Proc& obj_XML_Proc, vec_Include_Info& obj_vec_Include_Info);
+
 void Create_DB_Environment(_XML_Proc& obj_XML_Proc);
 
 bool Create_DB_H(_XML_Proc& obj_XML_Proc);
