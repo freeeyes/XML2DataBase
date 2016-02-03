@@ -621,7 +621,7 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 		sprintf_safe(szTemp, 200, "\t}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-		sprintf_safe(szTemp, 200, "private:\n");
+		sprintf_safe(szTemp, 200, "protected:\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		for(int j = 0; j < (int)obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info.size(); j++)
 		{
@@ -1417,7 +1417,8 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			{
 				//数组数据,判断是否是当前已有的数据类型
 				bool blFlag = false;
-				for(int k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); k++)
+				int k = 0;
+				for( k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); k++)
 				{
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[k].m_sz_Class_Name, 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type) == 0)
@@ -1439,15 +1440,45 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					sprintf_safe(szTemp, 200, "\t{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-					sprintf_safe(szTemp, 200, "\t\trapidjson::Value value_str;\n");
+					sprintf_safe(szTemp, 200, "\t\trapidjson::Value object(rapidjson::kObjectType);\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-					sprintf_safe(szTemp, 200, "\t\tvalue_str.SetString(m_obj_%s[i].serialization().c_str(),m_obj_%s[i].serialization().size(), allocator);\n",
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					for(int kLoop = 0; kLoop < (int)obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info.size(); kLoop++)
+					{
+						if (strcmp(obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Class_Type, "char") == 0)
+						{
+							sprintf_safe(szTemp, 200, "\t\trapidjson::Value value_str%s;\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-					sprintf_safe(szTemp, 200, "\t\tarray.PushBack(value_str, allocator);\n");
+							sprintf_safe(szTemp, 200, "\t\tvalue_str%s.SetString(m_obj_%s[i].get_%s(),strlen(m_obj_%s[i].get_%s()),allocator);\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t\tobject.AddMember(\"%s\",value_str%s,allocator);\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else if (strcmp(obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Class_Type, "int") == 0)
+						{
+							sprintf_safe(szTemp, 200, "\t\tobject.AddMember(\"%s\",m_obj_%s[i].get_%s(),allocator);\n",
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[k].m_obj_vec_Column_Info[kLoop].m_sz_Column_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						}
+						else
+						{
+							printf("unkown data type!!!\n");
+						}
+					}
+
+					sprintf_safe(szTemp, 200, "\t\tarray.PushBack(object, allocator);\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 					sprintf_safe(szTemp, 200, "\t}\n");
