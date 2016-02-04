@@ -124,6 +124,9 @@ bool Create_DB_Server_Pool_H(_XML_Proc& obj_XML_Proc)
 		sprintf_safe(szTemp, 200, "void Save_%s_Pool_Proc();\n",
 			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		sprintf_safe(szTemp, 200, "void Read_%s_File_Cache(const char* pPath, const char* pBakPath);\n", 
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
 	}
 
 	sprintf_safe(szTemp, 200, "#endif\n");
@@ -272,6 +275,17 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+		//添加读写Cache文件的方法
+		sprintf_safe(szTemp, 200, "void Read_%s_File_Cache(const char* pPath, const char* pBakPath)\n\n", 
+			obj_Vec_Save_Pool_Info[i].m_sz_Class_Name);
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "{\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "\t\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+		sprintf_safe(szTemp, 200, "}\n\n");
+		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 
 	fclose(pFile);
@@ -313,6 +327,28 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	sprintf_safe(szTemp, 200, "#include <errno.h>\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+	sprintf_safe(szTemp, 200, "#ifdef _WIN32\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include <io.h>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#else\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include <unistd.h>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include <stdio.h>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include <dirent.h>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include <sys/stat.h>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#endif\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "#include <vector>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "using namespace std;\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	//引入数据库文件
 	sprintf_safe(szTemp, 200, "#include \"iniparser.h\"\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -321,6 +357,127 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	sprintf_safe(szTemp, 200, "#include \"DB_Pool_Save.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+	//添加遍历目录函数
+	sprintf_safe(szTemp, 200, "typedef vector<string> vec_File_Name;\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "bool Read_Xml_Folder( string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#ifdef WIN32\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t_finddata_t FileInfo;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tstring strfind = folderPath + \"\\*\";\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tlong Handle = _findfirst(strfind.c_str(), &FileInfo);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tif (Handle == -1L)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\treturn false;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tdo\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tif (FileInfo.attrib & _A_SUBDIR)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\telse\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tstring filename = folderPath + \"\\\" + FileInfo.name;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tobj_vec_Xml_File_Name.push_back(filename);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}while (_findnext(Handle, &FileInfo) == 0);\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t_findclose(Handle);\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#else\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tDIR *dp;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tstruct dirent *entry;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tstruct stat statbuf;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tif((dp = opendir(folderPath.c_str())) == NULL)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tprintf(\"cannot open directory: %%s\\n\", folderPath.c_str());\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\treturn false;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tchdir(folderPath.c_str());\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\twhile((entry = readdir(dp)) != NULL)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tlstat(entry->d_name,&statbuf);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tif(S_ISDIR(statbuf.st_mode))\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tif(strcmp(\".\",entry->d_name) == 0 || strcmp(\"..\",entry->d_name) == 0)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\t\tcontinue;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\telse\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tstring filename = folderPath + \"/\" + entry->d_name;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tobj_vec_Xml_File_Name.push_back(filename);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t}\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tchdir(\"..\");\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tclosedir(dp);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#endif\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\treturn true;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "}\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//剪切文件函数
+	sprintf_safe(szTemp, 200, "static void Tranfile_Cut(const char* pFileSrc, const char* pFileDes)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tfstream fsCopee( pFileSrc, ios::binary | ios::in ) ;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tfstream fsCoper( pFileDes, ios::binary | ios::out ) ;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tfsCoper << fsCopee.rdbuf() ;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "}\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//添加进程锁函数
 	sprintf_safe(szTemp, 200, "int AcquireWriteLock(int fd, int start, int len)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
@@ -424,8 +581,15 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\ttsSleep.tv_sec  = %d;\n", obj_DB_Server_Info.m_DB_Server_Run_Info.m_n_Interval);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\ttsSleep.tv_nsec = 0;\n");
+	sprintf_safe(szTemp, 200, "\ttsSleep.tv_nsec = 0;\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	//读取Cache文件路径
+	sprintf_safe(szTemp, 200, "\tchar* pFileData = iniparser_getstring(pDictionary, \"CacheFile:FilePath\", NULL);\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tchar* pFileBakData = iniparser_getstring(pDictionary, \"CacheFile:FileBakPath\", NULL);\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	
 	sprintf_safe(szTemp, 200, "\twhile(true)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t{\n");
@@ -720,7 +884,7 @@ bool Create_DB_Server_Ini_File(_DB_Server_Info& obj_DB_Server_Info)
 		return false;
 	}
 
-	sprintf_safe(szTemp, 200, "[DBConfig]\n\n");
+	sprintf_safe(szTemp, 200, "[DBConfig]\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "DBIP=\"%s\"\n", obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_IP);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -728,7 +892,14 @@ bool Create_DB_Server_Ini_File(_DB_Server_Info& obj_DB_Server_Info)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "DBUser=\"%s\"\n", obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_User);
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "DBPass=\"%s\"\n", obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_Pass);
+	sprintf_safe(szTemp, 200, "DBPass=\"%s\"\n\n", obj_DB_Server_Info.m_DB_Server_Config.m_sz_DB_Pass);
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+	sprintf_safe(szTemp, 200, "[CacheFile]\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "FilePath=\"./\"\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "FileBakPath=\"./\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	fclose(pFile);
