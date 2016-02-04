@@ -597,7 +597,8 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			}
 			else if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length > 0 && strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
 			{
-				sprintf_safe(szTemp, 200, "\t\tsprintf(this->m_obj_%s, \"%%s\", ar.m_obj_%s);\n",
+				sprintf_safe(szTemp, 200, "\t\tsnprintf(this->m_obj_%s,sizeof(this->m_obj_%s),\"%%s\", ar.m_obj_%s);\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1052,7 +1053,8 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\tsprintf(m_obj_%s, \"%%s\", obj_%s);\n", 
+					sprintf_safe(szTemp, 200, "\tsnprintf(m_obj_%s,sizeof(m_obj_%s),\"%%s\", obj_%s);\n", 
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1637,11 +1639,35 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					sprintf_safe(szTemp, 200, "\t\t\t{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-					sprintf_safe(szTemp, 200, "\t\t\t\tstring strJson = (string)d[\"array_%s\"][i].GetString();\n",
+					sprintf_safe(szTemp, 200, "\t\t\t\tif (d[\"array_%s\"][i].IsArray())\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s[i].unserialization(strJson);\n",
+
+					sprintf_safe(szTemp, 200, "\t\t\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					
+					sprintf_safe(szTemp, 200, "\t\t\t\t\tfor (int j = 0; j< d[\"array_%s\"][i].Capacity(); ++j)\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					sprintf_safe(szTemp, 200, "\t\t\t\t\t{\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					sprintf_safe(szTemp, 200, "\t\t\t\t\t\trapidjson::Value& first = d[\"array_%s\"][i][j];\n", 
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					
+					sprintf_safe(szTemp, 200, "\t\t\t\t\t\tstring strJson = (string)first.GetString();\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					
+					sprintf_safe(szTemp, 200, "\t\t\t\t\t\tm_obj_%s[i].unserialization(strJson);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					sprintf_safe(szTemp, 200, "\t\t\t\t\t}\n");
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					sprintf_safe(szTemp, 200, "\t\t\t\t}\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						
 					sprintf_safe(szTemp, 200, "\t\t\t}\n");
@@ -1704,7 +1730,8 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "\t\t\tsprintf(m_obj_%s, \"%%s\", d[\"%s\"].GetString());\n",
+					sprintf_safe(szTemp, 200, "\t\t\tsnprintf(m_obj_%s,sizeof(m_obj_%s),\"%%s\", d[\"%s\"].GetString());\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
