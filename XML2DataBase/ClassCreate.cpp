@@ -1853,7 +1853,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Db_Type, "int") == 0)
 					{
-						sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s = d[\"array_%s\"][i].GetInt()\");\n",
+						sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s = d[\"array_%s\"][i].GetInt());\n",
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
