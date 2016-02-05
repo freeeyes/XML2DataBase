@@ -870,7 +870,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\treturn false;\n");
+				sprintf_safe(szTemp, 200, "\t\treturn true;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -883,7 +883,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\treturn false;\n");
+				sprintf_safe(szTemp, 200, "\t\treturn true;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -901,7 +901,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-				sprintf_safe(szTemp, 200, "\t\t\treturn false;\n");
+				sprintf_safe(szTemp, 200, "\t\t\treturn true;\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				sprintf_safe(szTemp, 200, "\t\t}\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -910,7 +910,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 			}
 		}
 
-		sprintf_safe(szTemp, 200, "\treturn true;\n");
+		sprintf_safe(szTemp, 200, "\treturn false;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "}\n\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
