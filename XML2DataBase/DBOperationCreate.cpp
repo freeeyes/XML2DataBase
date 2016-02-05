@@ -1534,7 +1534,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tif (!ptr%s[iLoop].check_init())\n",
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tif (ptr%s[iLoop].check_init())\n",
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 

@@ -515,7 +515,7 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\tif(true == m_list_%s[i].check_init())\n",
+					sprintf_safe(szTemp, 200, "\t\t\tif(!m_list_%s[i].check_init())\n",
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t\t{\n");
@@ -633,7 +633,7 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\tif(true == m_list_%s[i].check_init())\n",
+					sprintf_safe(szTemp, 200, "\t\t\tif(!m_list_%s[i].check_init())\n",
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t\t{\n");
