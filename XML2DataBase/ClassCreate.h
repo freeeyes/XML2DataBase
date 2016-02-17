@@ -15,6 +15,8 @@
 #include <fstream>
 using namespace std;
 
+bool Check_Is_Base_Type(const char* pClassName, _XML_Proc obj_XML_Proc);
+
 void Copy_ShareMemory_File(string folderPath, string newfolderPath);
 
 void Copy_Json_File(string folderPath, string newfolderPath);
