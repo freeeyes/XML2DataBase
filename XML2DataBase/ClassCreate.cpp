@@ -1613,20 +1613,20 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t\t{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\tif (d[\"array_%s\"][i].IsObject())\n",
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\t{\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\t\tstring str_%s_Json = d[\"%s\"][i].GetString();\n",
+					//sprintf_safe(szTemp, 200, "\t\t\t\tif (d[\"array_%s\"][i].IsObject())\n",
+					//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					//sprintf_safe(szTemp, 200, "\t\t\t\t{\n");
+					//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					sprintf_safe(szTemp, 200, "\t\t\t\tstring str_%s_Json = d[\"array_%s\"][i].GetString();\n",
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\t\tm_obj_%s[i].unserialization(str_%s_Json);\n",
+					sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s[i].unserialization(str_%s_Json);\n",
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\t}\n");
+					//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					//sprintf_safe(szTemp, 200, "\t\t\t\t}\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t\t}\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
