@@ -36,6 +36,12 @@ bool Create_Class_Pool_H(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "#include \"DB_Op.h\"\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+			if(strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_ShmKey) > 0)
+			{
+				sprintf_safe(szTemp, 200, "#include \"ShareMemory.h\"\n");
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+
 			//添加引用基类头文件
 			sprintf_safe(szTemp, 200, "#include \"%s.h\"\n\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);

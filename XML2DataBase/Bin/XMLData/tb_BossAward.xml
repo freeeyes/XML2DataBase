@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- add by freeeyes -->
+<configer ProcName="DBTest" DB="mysql">
+	<TableClass database="db_test" table="tb_bossaward" class="CBossAward" func="">
+		<Column name="bossid" dbtype="int" classtype="int" value="0" />
+		<Column name="bosslevel" dbtype="int" classtype="int" value="0" />
+		<Column name="awardid" dbtype="int" classtype="int" value="0" />
+	</TableClass>
+	
+	<TableExt database="db_test" table="tb_bossaward" class="CBossAward" >
+		<!-- 联合主键,表无联合主键是为空-->
+		<UnionKey value="bossid,bosslevel" />
+		<!-- 普通索引-->
+		<Index value="bossid" type="normal" /> 
+		<Index value="bosslevel" type="normal" />
+
+		<!-- 扩展sql只支持查询操作,不支持其他操作 
+		  selecttype为1表示查询正常的数据库记录,此时返回数据类型如 vector<CBossAward>& vecObj;
+		  为2数值时表示非正常数据库记录比如 count(*)或者查询指定的字段信息,此时返回数据类型如 vector < map<string, string> >& vmResultData;使用者需要对返回的字段值自己处理	
+		-->
+		<Sql value="select * from db_test.tb_bossaward where bossid = %d and bosslevel = %d;" funcname="select_tb_bossaward1" selecttype="1" inputvalue="int bossid,int bosslevel,vector<CBossAward>&amp; vecObj"/>
+
+		<Sql value="select count(*) from db_test.tb_bossaward where bossid = %d and bosslevel = %d;" funcname="select_tb_bossaward2" selecttype="2" inputvalue="int bossid,int bosslevel,vector<map<string,string> >&amp; vmResultData"/>
+	</TableExt>	
+</configer>
