@@ -542,7 +542,7 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-						sprintf_safe(szTemp, 200, "\t%s_Logic& get_%s();\n", 
+						sprintf_safe(szTemp, 200, "\t%s_Logic* get_%s();\n", 
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1078,7 +1078,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						if(Check_Is_Base_Type(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, obj_XML_Proc) == true)
 						{
 							//基础类型直接返回对象
-							sprintf_safe(szTemp, 200, "%s_Logic %s::get_%s()\n", 
+							sprintf_safe(szTemp, 200, "%s %s::get_%s()\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
@@ -1101,14 +1101,13 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 							sprintf_safe(szTemp, 200, "{\n");
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-							sprintf_safe(szTemp, 200, "\treturn (%s_Logic* )&m_obj_%s;\n", 
+							sprintf_safe(szTemp, 200, "\treturn (%s_Logic*)&m_obj_%s;\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 							sprintf_safe(szTemp, 200, "}\n\n");
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
-
 						bfindLogic = true;
 						break;
 					}
