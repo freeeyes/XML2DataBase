@@ -422,17 +422,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 							if((obj_vec_Include_Info[k].m_n_Need_Logic_Class == 1)&&
 								(strcmp(obj_vec_Include_Info[k].m_szInclude, obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type) == 0))
 							{
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
-									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
-								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								//sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
+								//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, 
 									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
-									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								//sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
+								//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 								bfindLogic = true;
 								break;
@@ -441,17 +442,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 						if (!bfindLogic)
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s objjson;\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s objjson;\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 					}
 					else
@@ -472,17 +474,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						}
 						else
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 					}
 				}
@@ -498,17 +501,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 							if((obj_vec_Include_Info[k].m_n_Need_Logic_Class == 1)&&
 								(strcmp(obj_vec_Include_Info[k].m_szInclude, obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type) == 0))
 							{
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
-									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
-								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								//sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
+								//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, 
 									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
-									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								//sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
+								//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 								bfindLogic = true;
 								break;
@@ -517,17 +521,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 						if (!bfindLogic)
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s objjson;\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s objjson;\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 					}
 					else
@@ -548,17 +553,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						}
 						else
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\t%s_Logic objjson;\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(objjson);\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 					}					
 				}
@@ -1175,20 +1181,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 					if(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_n_Length == 0)
 					{
 						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Db_Type, "json") == 0)
-						{
-							/*sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);*/
-
-							
+						{						
 							bool bfindLogic = false;
 					
 							for(int kLoop = 0; kLoop < (int)obj_vec_Include_Info.size(); kLoop++)
@@ -1197,17 +1190,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 								if((obj_vec_Include_Info[kLoop].m_n_Need_Logic_Class == 1)&&
 									(strcmp(obj_vec_Include_Info[kLoop].m_szInclude, obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type) == 0))
 								{
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s_Logic objjson;\n", 
-										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
-									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+									//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s_Logic objjson;\n", 
+									//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
+									//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
-										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
-									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+									//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
+									//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+									//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 									bfindLogic = true;
 									break;
@@ -1216,17 +1210,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 							if (!bfindLogic)
 							{
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
-									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
-								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
+								//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
+								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
-									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
-								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
+								//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 							}	
 						}
 						else
@@ -1255,17 +1250,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 									if((obj_vec_Include_Info[kLoop].m_n_Need_Logic_Class == 1)&&
 										(strcmp(obj_vec_Include_Info[kLoop].m_szInclude, obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type) == 0))
 									{
-										sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s_Logic objjson;\n", 
-											obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
-										fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+										//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s_Logic objjson;\n", 
+										//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
+										//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-										sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+										sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+											obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 											obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 										fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-										sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
-											obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
-										fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+										//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
+										//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+										//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 										bfindLogic = true;
 										break;
@@ -1274,17 +1270,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 								if (!bfindLogic)
 								{
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
-										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
-									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+									//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
+									//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
+									//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
-										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
-									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+									//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
+									//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+									//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 								}
 							}
 						}
@@ -1293,17 +1290,18 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 					{
 						if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Db_Type, "json") == 0)
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\t%s objjson;\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobjjson.unserialization(vmResultData[0][\"%s\"]);\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s().unserialization(vmResultData[0][\"%s\"]);\n", 
+								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							//sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(objjson);\n", 
+							//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
+							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 						else
 						{

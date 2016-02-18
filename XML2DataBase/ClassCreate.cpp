@@ -283,6 +283,9 @@ void Create_Define_H(_Proc_Define_Info& obj_Proc_Define_Info)
 	sprintf_safe(szTemp, 200, "#include <iostream>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+	sprintf_safe(szTemp, 200, "#include <string>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	sprintf_safe(szTemp, 200, "using namespace std;\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -327,8 +330,40 @@ void Create_Define_H(_Proc_Define_Info& obj_Proc_Define_Info)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	}
 
+	//Ìí¼Ó×Ö·û´®Ìæ»»º¯Êý
+	sprintf_safe(szTemp, 200, "inline string& replace_all_distinct(string& str,const string& old_value,const string& new_value)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tfor(string::size_type pos(0); pos!=string::npos; pos+=new_value.length())\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tif((pos=str.find(old_value,pos))!=string::npos)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tstr.replace(pos,old_value.length(),new_value);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\telse\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t\tbreak;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\treturn str;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "}\n\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	//Ìí¼Ósprintf±ß½ç¼ì²éº¯Êý
-	sprintf_safe(szTemp, 200, "inline void sprintf_safe(char* szText, int nLen, const char* fmt ...)\n");
+	sprintf_safe(szTemp, 200, "inline void sprintf_common(char* szText, int nLen, const char* fmt ...)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -646,7 +681,7 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 			}
 			else if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length > 0 && strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "char") == 0)
 			{
-				sprintf_safe(szTemp, 200, "\t\tsprintf_safe(this->m_obj_%s,sizeof(this->m_obj_%s),\"%%s\", ar.m_obj_%s);\n",
+				sprintf_safe(szTemp, 200, "\t\tsprintf_common(this->m_obj_%s,sizeof(this->m_obj_%s),\"%%s\", ar.m_obj_%s);\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
@@ -1095,7 +1130,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\tsprintf_safe(m_obj_%s,sizeof(m_obj_%s),\"%%s\", obj_%s);\n", 
+					sprintf_safe(szTemp, 200, "\tsprintf_common(m_obj_%s,sizeof(m_obj_%s),\"%%s\", obj_%s);\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
@@ -1285,18 +1320,9 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "\tint i = 0;\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\tfor(i = 0; i < %d; i++);\n", 
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t{\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\tm_obj_%s[i] = %s;\n", 
+					sprintf_safe(szTemp, 200, "\tmemset(m_obj_%s,0,sizeof(m_obj_%s));\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Init_Value);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t}\n");
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				}
 			}
@@ -1402,6 +1428,12 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					sprintf_safe(szTemp, 200, "\tstr_%s_Json = replace_all_distinct(str_%s_Json,\"\\\"\",\"\\\\\\\"\");\n", 
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 					sprintf_safe(szTemp, 200, "\tvalue_%s.SetString(str_%s_Json.c_str(), static_cast<size_t>(str_%s_Json.length()), allocator);\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
@@ -1459,6 +1491,12 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					sprintf_safe(szTemp, 200, "\t\tstr_%s_Json = replace_all_distinct(str_%s_Json,\"\\\"\",\"\\\\\\\"\");\n", 
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					
 					sprintf_safe(szTemp, 200, "\t\tobject.SetString(str_%s_Json.c_str(), static_cast<size_t>(str_%s_Json.length()), allocator);\n",
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
@@ -1643,7 +1681,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, 200, "\t\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, 200, "\t\t\tsprintf_safe(m_obj_%s,sizeof(m_obj_%s),\"%%s\", d[\"%s\"].GetString());\n",
+				sprintf_safe(szTemp, 200, "\t\t\tsprintf_common(m_obj_%s,sizeof(m_obj_%s),\"%%s\", d[\"%s\"].GetString());\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
