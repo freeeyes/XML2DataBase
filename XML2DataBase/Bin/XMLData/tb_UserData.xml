@@ -1,24 +1,26 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
-<!-- add by freeeyes -->
 <configer ProcName="DBTest" DB="mysql">
-  	<TableClass database="db_test" class="CUserGrid" desc="">
-		<!-- 格子内的对象ID，如果没有则是0 -->
-		<Column name="gridid" dbtype="int" classtype="int" value="0" />
-		<!-- 格子中的物品类型，如果没有则是0 -->
-		<Column name="gridtype" dbtype="int" classtype="int" value="0" />
-		<!-- 格子中的物品描述，如果没有默认值是空 -->
-		<Column name="griddesc" dbtype="varchar" classtype="char" length="50" value="'\0'" />
-		<!-- 格子中的物品个数，如果没有默认值是0 -->
-		<Column name="gridcount" dbtype="int" classtype="int" value="0" />
+  	<TableClass database="db_test" class="CUserItem" desc="">
+		<Column name="id" dbtype="int" classtype="int" value="0" />
+		<Column name="firsttype" dbtype="int" classtype="int" value="0" />
+		<Column name="secondtype" dbtype="int" classtype="int" value="0" />
+		<Column name="lv" dbtype="int" classtype="int" value="0" />
+		<Column name="sale" dbtype="int" classtype="int" value="0" />
+		<Column name="buy" dbtype="int" classtype="int" value="0" />
+		<Column name="cumulate" dbtype="int" classtype="int" value="0" />
+		<!-- 当前叠加数量 -->
+		<Column name="maxcumulate" dbtype="int" classtype="int" value="0" />
+		<Column name="skill" dbtype="varchar" classtype="char" length="256" value="'\0'" />
+		<!-- 扩展属性 -->
+		<Column name="extraattributes" dbtype="int" classtype="int" length="50" value="0" />
 	</TableClass>  
-  
-    <!-- 如果type是背包类型,要增对背包类提供额外的增加物品,获取物品，使用物品的接口 -->
- 	<TableClass database="db_test" class="CUserGridList" needlogicclass="1" desc="">
-		<!-- GridID 一般与之匹配的是UserID 默认是0-->
-		<Column name="gridid" dbtype="int" classtype="int" value="" />
+  	
+ 	<TableClass database="db_test" class="CUserBagList" needlogicclass="1" desc="">
+ 		<!-- 背包当前限制 -->
+		<Column name="baglimit" dbtype="int" classtype="int" value="0" />
 		<!-- 一个List对象，最多有20个格子 -->
-		<Column name="usergrid" dbtype="varchar" classtype="CUserGrid" length="20" />
+		<Column name="useritems" dbtype="varchar" classtype="CUserItem" length="20" />
 	</TableClass> 
   
 	<!-- 如果这个对象需要内存池，需要指定classpool标签的个数，如果需要共享内存，则需要填写shmkey(为保证跨平台key必须是数字) -->
@@ -35,7 +37,7 @@
 		<!-- 最后更新时间，这个字段由update的时候，自动记录。-->
 		<Column name="activetime" dbtype="date" classtype="int" value="0" />
 		<!-- 用户身上物品格子。用于测试类之间的包含，这部分存储为json到数据库 -->
-		<Column name="usergridlist" dbtype="varchar" classtype="CUserGridList"/>
+		<Column name="userbaglist" dbtype="varchar" classtype="CUserBagList"/>
 	</TableClass>
 
 	<TableExt database="db_test" table="tb_userdata" class="CUserData" >
