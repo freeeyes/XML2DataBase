@@ -168,6 +168,7 @@ struct _Table_Ext_SQL
 	char m_sz_Func_Name[MAX_BUFF_50];
 	char m_sz_Input_Value[MAX_BUFF_100];
 	int  m_n_Select_Type;
+	int  m_n_For_Pool;
 
 	_Table_Ext_SQL()
 	{
@@ -175,6 +176,7 @@ struct _Table_Ext_SQL
 		m_sz_Func_Name[0]    = '\0';
 		m_sz_Input_Value[0]  = '\0';
 		m_n_Select_Type = 0;
+		m_n_For_Pool = 0;
 	}
 };
 typedef vector<_Table_Ext_SQL> vec_Table_Ext_SQL;

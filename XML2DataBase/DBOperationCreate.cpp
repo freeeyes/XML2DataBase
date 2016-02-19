@@ -264,11 +264,13 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+				/*
 				sprintf_safe(szTemp, 200, "bool save_data_to_%s(%s* ptr%s, int poolsize);\n", 
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				*/
 				break;
 			}
 		}
@@ -1484,57 +1486,65 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 					{
 						for(int k = 0; k < (int)obj_XML_Proc.m_obj_vec_Table_Ext[j].m_obj_vec_Table_Ext_SQL.size(); k++)
 						{
-							sprintf_safe(szTemp, sizeof(szTemp), "\tbool bResult = %s(vecObj);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Ext[j].m_obj_vec_Table_Ext_SQL[0].m_sz_Func_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\tif(!bResult)\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+							if (1 == obj_XML_Proc.m_obj_vec_Table_Ext[j].m_obj_vec_Table_Ext_SQL[0].m_n_For_Pool)
+							{
+								sprintf_safe(szTemp, sizeof(szTemp), "\tbool bResult = %s(vecObj);\n", 
+									obj_XML_Proc.m_obj_vec_Table_Ext[j].m_obj_vec_Table_Ext_SQL[0].m_sz_Func_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\tif(!bResult)\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tcout<<\"exec load_data_from_%s error\"<<endl;\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\treturn bResult;\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\tcout<<\"exec load_data_from_%s error\"<<endl;\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\treturn bResult;\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\tint mixpoolsize = poolsize;\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\tif(vecObj.size() < mixpoolsize)\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\tint mixpoolsize = poolsize;\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\tif(vecObj.size() < mixpoolsize)\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tmixpoolsize = vecObj.size();\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\tmixpoolsize = vecObj.size();\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							
-							sprintf_safe(szTemp, sizeof(szTemp), "\tfor(int iLoop = 0; iLoop < mixpoolsize; ++iLoop)\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								
+								sprintf_safe(szTemp, sizeof(szTemp), "\tfor(int iLoop = 0; iLoop < mixpoolsize; ++iLoop)\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\tptr%s[iLoop] = vecObj[iLoop];\n",
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\tptr%s[iLoop] = vecObj[iLoop];\n",
+									obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\treturn true;\n");
-							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								sprintf_safe(szTemp, sizeof(szTemp), "\t}\n\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+								sprintf_safe(szTemp, sizeof(szTemp), "\treturn true;\n");
+								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+								break;
+							}
+							else
+							{
+								continue;
+							}
 						}
 
 						break;
@@ -1545,6 +1555,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 				//test
+				/*
 				sprintf_safe(szTemp, 200, "bool save_data_to_%s(%s* ptr%s, int poolsize)\n", 
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
@@ -1614,6 +1625,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 				sprintf_safe(szTemp, 200, "}\n\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				*/
 				//test
 			}
 		}
