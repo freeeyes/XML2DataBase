@@ -74,7 +74,10 @@ bool Create_DB_Server_Pool_H(_XML_Proc& obj_XML_Proc)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#endif\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
+	sprintf_safe(szTemp, 200, "#include<iostream>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "#include<fstream>\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "#include <vector>\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "using namespace std;\n\n");
@@ -172,14 +175,14 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		return false;
 	}
 
-	sprintf_safe(szTemp, 200, "#include \"DB_Pool_Save.h\"\n");
+	sprintf_safe(szTemp, 200, "#include \"DB_Pool_Save.h\"\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	//公共函数
 	//遍历目录函数
-	sprintf_safe(szTemp, 200, "typedef vector<string> vec_File_Name;\n\n");
+	sprintf_safe(szTemp, 200, "typedef vector<string> vec_File_Name;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "bool Read_Xml_Folder( string folderPath, vec_Xml_File_Name& obj_vec_Xml_File_Name)\n");
+	sprintf_safe(szTemp, 200, "bool Read_Xml_Folder( string folderPath, vec_File_Name& obj_vec_Xml_File_Name)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -213,7 +216,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t\t\tstring filename = folderPath + \"\\\" + FileInfo.name;\n");
+	sprintf_safe(szTemp, 200, "\t\t\tstring filename = folderPath + \"\\\\\" + FileInfo.name;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t\tobj_vec_Xml_File_Name.push_back(filename);\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -311,7 +314,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t\tif(pPath[i] == '\\')\n");
+	sprintf_safe(szTemp, 200, "\t\tif(pPath[i] == '\\\\')\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -472,23 +475,23 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tRead_Xml_Folder(szPoolPath, obj_vec_File_Name);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\tfor(int i = 0; i <(int)obj_vec_File_Name.size(); i++;\n");
+		sprintf_safe(szTemp, 200, "\tfor(int i = 0; i <(int)obj_vec_File_Name.size(); i++)\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t{\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\tchar szFileName[MAX_BUFF_50] = {'\\0'};\n");
+		sprintf_safe(szTemp, 200, "\t\tchar szFileName[200] = {'\\0'};\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\tchar szBakPath[MAX_BUFF_50]  = {'\\0'};\n");
+		sprintf_safe(szTemp, 200, "\t\tchar szBakPath[200]  = {'\\0'};\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\tGet_Path_File_Name(obj_vec_File_Name[i].c_str(), szFileName);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\tsprintf_s(szBakPath, MAX_BUFF_50, \"%%s/%%s\", pBakPath, szFileName);\n");
+		sprintf_safe(szTemp, 200, "\t\tsprintf_common(szBakPath, 200, \"%%s/%%s\", pBakPath, szFileName);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\tTranfile_Cut(obj_vec_File_Name[i].c_str(), szBakPath);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t//add DB Save\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\tFile* pFile = fopen(szBakPath, \"wb\");\n");
+		sprintf_safe(szTemp, 200, "\t\tFILE* pFile = fopen(szBakPath, \"wb\");\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\tif(NULL != pFile)\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -500,7 +503,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\tfseek(pFile, 0, SEEK_SET);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\t\tpFileBuff = new char[nFileSize + 1];\n");
+		sprintf_safe(szTemp, 200, "\t\t\tchar* pFileBuff = new char[nFileSize + 1];\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\tfread(pFileBuff, nFileSize, sizeof(char), pFile);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
