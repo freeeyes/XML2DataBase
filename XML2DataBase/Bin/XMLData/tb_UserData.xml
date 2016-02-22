@@ -45,6 +45,6 @@
 		  selecttype为1表示查询正常的数据库记录,此时返回数据类型如 vector<CUserData>& vecObj;
 		  为2数值时表示非正常数据库记录比如 count(*)或者查询指定的字段信息,此时返回数据类型如 vector < map<string, string> >& vmResultData;使用者需要对返回的字段值自己处理	
 		-->
-		<Sql value="select * from db_test.tb_userdata order by activetime desc limit 300;" funcname="select_tb_userdata_for_pool" selecttype="1" inputvalue="vector<CUserData>&amp; vecObj"/>
+		<Sql value="select * from db_test.tb_userdata order by activetime desc limit 300;" funcname="select_tb_userdata_for_pool" selecttype="1"  forpool="1" inputvalue="vector<CUserData>&amp; vecObj"/>
 	</TableExt>
 </configer>
