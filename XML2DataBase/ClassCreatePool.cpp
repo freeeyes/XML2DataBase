@@ -33,6 +33,9 @@ bool Create_Class_Pool_H(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "#include \"Lru.h\"\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
+			sprintf_safe(szTemp, 200, "#include \"CachePool.h\"\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 			sprintf_safe(szTemp, 200, "#include \"DB_Op.h\"\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -195,14 +198,14 @@ bool Create_Class_Pool_H(_XML_Proc& obj_XML_Proc)
 					{
 						if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
 						{
-							sprintf_safe(szTemp, 200, "\tLRUCache<%s , %s>* m_lru_cache;\n", 
+							sprintf_safe(szTemp, 200, "\tCCachePool<%s, %s>* m_lru_cache;\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 						else
 						{
-							sprintf_safe(szTemp, 200, "\tLRUCache<char* , %s>* m_lru_cache;\n", 
+							sprintf_safe(szTemp, 200, "\tCCachePool<char*, %s>* m_lru_cache;\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
@@ -319,8 +322,34 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "#include \"%s_Pool.h\"\n\n", obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			//sprintf_safe(szTemp, sizeof(szTemp), "#include \"DB_Op.h\"\n\n");
-			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			sprintf_safe(szTemp, 200, "int Callback_Eliminate(%s* pData)\n", 
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\treturn 0;\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "bool Callback_Check_Valid(int& key, %s* pData)\n", 
+				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "{\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\tkey = pData->getkey();\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "\treturn pData->check_init();\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+			sprintf_safe(szTemp, 200, "}\n\n");
+			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0)
 			{
@@ -703,19 +732,50 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 					{
 						if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length == 0)
 						{
-							sprintf_safe(szTemp, 200, "\tm_lru_cache = new LRUCache<%s, %s>(m_list_free_%s,%d*2,true);\n", 
+							sprintf_safe(szTemp, 200, "\tm_lru_cache = new CCachePool<%s, %s>;\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\tif (NULL != m_lru_cache)\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t\tm_lru_cache->Init(m_list_free_%s, %d*2,Callback_Check_Valid);\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t\tm_lru_cache->Set_CallBack_Func(Callback_Eliminate);\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t}\n");
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 						else
 						{
-							sprintf_safe(szTemp, 200, "\tm_lru_cache = new LRUCache<char*, %s>(m_list_free_%s,%d*2,true);\n", 
+							sprintf_safe(szTemp, 200, "\tm_lru_cache = new CCachePool<char*, %s>;\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\tif (NULL != m_lru_cache)\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t{\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t\tm_lru_cache->Init(m_list_free_%s, %d*2,Callback_Check_Valid);\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool);
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t\tm_lru_cache->Set_CallBack_Func(Callback_Eliminate);\n");
+							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+							sprintf_safe(szTemp, 200, "\t}\n");
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 						}
 						break;
