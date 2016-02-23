@@ -1078,14 +1078,14 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "\t{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\t\tif(m_list_offline_%s[i]->check_init())\n",
+			sprintf_safe(szTemp, 200, "\t\tif(m_list_offline_%s[i].check_init())\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			
 			sprintf_safe(szTemp, 200, "\t\t{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\t\t\tobj_vec_Key_%s_List.push_back(m_list_offline_%s[i]->get_%s());\n",
+			sprintf_safe(szTemp, 200, "\t\t\tobj_vec_Key_%s_List.push_back(m_list_offline_%s[i].get_%s());\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key);

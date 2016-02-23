@@ -1047,7 +1047,7 @@ bool Create_Make_File_Define(_XML_Proc& obj_XML_Proc)
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "AR = ar\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "CFLAGS = -g -O2 -D__LINUX__\n\n");
+	sprintf_safe(szTemp, 200, "CFLAGS = -g -O2 -D__LINUX__ -std=c++0x -Wno-deprecated\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	sprintf_safe(szTemp, 200, "#set Lua lib path\n");
