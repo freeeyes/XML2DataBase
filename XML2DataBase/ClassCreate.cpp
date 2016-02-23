@@ -1290,8 +1290,20 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\treturn NULL;\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					if(Check_Is_Base_Type(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, obj_XML_Proc) == true)
+					{
+						//如果是基础类型，返回对象
+						sprintf_safe(szTemp, 200, "\t\treturn 0;\n");
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else
+					{
+						//如果是自定义类则返回指针
+						sprintf_safe(szTemp, 200, "\t\treturn NULL;\n");
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					
 					sprintf_safe(szTemp, 200, "\t}\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
