@@ -13,6 +13,8 @@ using namespace std;
 
 #define MAX_DEFAULT_SIZE 1024
 
+//回调函数指针声明
+
 template <class K, class D>
 struct Node
 {
@@ -25,29 +27,15 @@ template <class K, class D>
 class LRUCache
 {
 public:
-    LRUCache(D* ptrdata, size_t size, bool is_pthread_safe = false)
+	LRUCache()
+	{
+		m_fnc_callback_eliminate = NULL;
+        m_fnc_callback_reset_object = NULL;
+	}
+
+    LRUCache(size_t size, bool is_pthread_safe = false)
     {
-        if(size <= 0)
-        {
-            size = MAX_DEFAULT_SIZE;
-        }
-
-        pthread_safe = is_pthread_safe;
-
-        entries = new Node<K,D>[size];
-
-        for(size_t i = 0; i < size; ++i)
-        {
-            entries[i].data = &ptrdata[i];
-            cached_entries.push_back(entries + i);
-        }
-
-        head = new Node<K,D>;
-        tail = new Node<K,D>;
-        head->prev = NULL;
-        head->next = tail;
-        tail->prev = head;
-        tail->next = NULL;
+        Init(size, is_pthread_safe);
     }
 
     ~LRUCache()
@@ -56,6 +44,30 @@ public:
         delete tail;
         delete[] entries;
     }
+    
+	void Init(size_t size, bool is_pthread_safe = false)
+	{
+		if(size <= 0)
+		{
+			size = MAX_DEFAULT_SIZE;
+		}
+
+        pthread_safe = is_pthread_safe;
+
+        entries = new Node<K,D>[size];
+
+		for(size_t i = 0; i < size; ++i)  
+		{
+			cached_entries.push_back(entries + i);  
+		}
+
+        head = new Node<K,D>;
+        tail = new Node<K,D>;
+        head->prev = NULL;
+        head->next = tail;
+        tail->prev = head;
+        tail->next = NULL;
+	}
 
     void Put(K key, D* data)
     {
@@ -68,8 +80,7 @@ public:
             if(node)
             {
                 detach(node);
-                memcpy_safe(data, sizeof(D), node->data, sizeof(D));
-                //node->data = data;
+                node->data = data;
                 attach(node);
             }
             else
@@ -77,10 +88,12 @@ public:
                 if(cached_entries.empty())
                 {
                     node = tail->prev;
+					if(NULL != m_fnc_callback_eliminate)
+					{
+						m_fnc_callback_eliminate(node->data);
+					}
                     detach(node);
                     cached_map.erase(node->key);
-
-                    node->data->outputfile();
                 }
                 else
                 {
@@ -89,8 +102,7 @@ public:
                 }
 
                 node->key = key;
-                memcpy_safe(data, sizeof(D), node->data, sizeof(D));
-                //node->data = data;
+                node->data = data;
                 cached_map[key] = node;
                 attach(node);
             }
@@ -102,8 +114,7 @@ public:
             if(node)
             {
                 detach(node);
-                memcpy_safe(data, sizeof(D), node->data, sizeof(D));
-                //node->data = data;
+                node->data = data;
                 attach(node);
             }
             else
@@ -111,10 +122,12 @@ public:
                 if(cached_entries.empty())
                 {
                     node = tail->prev;
+					if(NULL != m_fnc_callback_eliminate)
+					{
+						m_fnc_callback_eliminate(node->data);
+					}
                     detach(node);
                     cached_map.erase(node->key);
-
-                    node->data->outputfile();
                 }
                 else
                 {
@@ -123,13 +136,33 @@ public:
                 }
 
                 node->key = key;
-                memcpy_safe(data, sizeof(D), node->data, sizeof(D));
-                //node->data = data;
+                node->data = data;
                 cached_map[key] = node;
                 attach(node);
             }
         }
     }
+    
+	D* Get_Tail(K key)
+	{
+		Node<K,D>* node = NULL;
+		node = tail->prev;
+		D* pData = node->data;
+		if(NULL != m_fnc_callback_eliminate)
+		{
+			m_fnc_callback_eliminate(pData);
+            m_fnc_callback_reset_object(pData);
+		}
+		detach(node);
+		cached_map.erase(node->key);
+
+		//把这个指针作为新元素加入
+		node->key = key;
+		node->data = pData;
+		cached_map[key] = node;
+		attach(node);
+		return pData;
+	}
 
     D* Get(K key)
     {
@@ -167,6 +200,57 @@ public:
         }
     }
 
+    void Free_Node(K key)
+    {
+        if(pthread_safe == true)
+        {
+            CThreadLock objThreadLock;
+
+            Node<K,D>* node = cached_map[key];
+
+            if(node)
+            {
+                detach(node);
+                cached_map.erase(node->key);
+                m_fnc_callback_reset_object(node->data);
+                return ;
+            }
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+            Node<K,D>* node = cached_map[key];
+
+            if(node)
+            {
+                detach(node);
+                cached_map.erase(node->key);
+                m_fnc_callback_reset_object(node->data);
+                return ;
+            }
+            else
+            {
+                return;
+            }
+        }
+    }
+
+	typedef int (*callback_eliminate)(D* pData);
+
+	void Set_CallBack_Func(callback_eliminate fnc_callback_eliminate)
+	{
+		m_fnc_callback_eliminate = fnc_callback_eliminate;
+	}
+
+    typedef void (*callback_reset_object)(D* pData);
+    void Set_CallBack_Func(callback_reset_object fnc_callback_reset_object)
+	{
+		m_fnc_callback_reset_object = fnc_callback_reset_object;
+	}
+    
 private:
     void detach(Node<K,D>* node)
     {
@@ -187,6 +271,9 @@ private:
     Node<K,D>* head, *tail;
     Node<K,D>* entries;
     bool pthread_safe;
+
+	callback_eliminate m_fnc_callback_eliminate;
+    callback_reset_object m_fnc_callback_reset_object;
 };
 
 #endif
