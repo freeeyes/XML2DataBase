@@ -1104,23 +1104,39 @@ bool Create_Make_File(_XML_Proc& obj_XML_Proc)
 
 	sprintf_safe(szTemp, 200, "include Makefile.define\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "PATS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o ../DBWrapper/DB_Op.o \\\n");
+	sprintf_safe(szTemp, 200, "PATS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o ../DBWrapper/DB_Op.o  ../ShareMemory/ShareMemory.o ../DataWrapper/MD5.o\\\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
 	{
 		//判断是否有Pool需要声明
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
 		{
-			sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s_Pool.o ../DataWrapper/%s.o \\\n",
+			sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s_Pool.o ../DataWrapper/%s.o\\\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
+		else
+		{
+			if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Need_Logic_Class == 1)
+			{
+				sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s.o \\\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s.o ../DataWrapper/%s_Logic.o \\\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+		}
 	}
-	sprintf_safe(szTemp, 200, "\t\t../DBWrapper/DB_Op.o ../DBWrapper/conn_pool.o ../DBWrapper/mysql_encap.o \n");
+	sprintf_safe(szTemp, 200, "\t\t../DBWrapper/conn_pool.o ../DBWrapper/mysql_encap.o \n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	sprintf_safe(szTemp, 200, "OBJS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o DB_Op.o \\\n");
+	sprintf_safe(szTemp, 200, "OBJS = DB_Pool_Save.o DB_Server.o dictionary.o iniparser.o DB_Op.o ShareMemory.o MD5.o\\\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	for(int i =0; i < (int)obj_XML_Proc.m_obj_vec_Table_Info.size(); i++)
 	{
@@ -1132,8 +1148,24 @@ bool Create_Make_File(_XML_Proc& obj_XML_Proc)
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
+		else
+		{
+			if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Need_Logic_Class == 1)
+			{
+				sprintf_safe(szTemp, 200, "\t\t%s.o %s_Logic.o \\\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+			else
+			{
+				sprintf_safe(szTemp, 200, "\t\t%s.o \\\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
+				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			}
+		}
 	}
-	sprintf_safe(szTemp, 200, "\t\tDB_Op.o conn_pool.o mysql_encap.o \n");
+	sprintf_safe(szTemp, 200, "\t\tconn_pool.o mysql_encap.o \n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	sprintf_safe(szTemp, 200, "APP_NAME = %s\n\n", obj_XML_Proc.m_sz_ProcName);
