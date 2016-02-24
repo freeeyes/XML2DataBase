@@ -182,7 +182,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 	//遍历目录函数
 	sprintf_safe(szTemp, 200, "typedef vector<string> vec_File_Name;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "bool Read_Xml_Folder( string folderPath, vec_File_Name& obj_vec_Xml_File_Name)\n");
+	sprintf_safe(szTemp, 200, "bool Read_Json_Folder( string folderPath, vec_File_Name& obj_vec_Xml_File_Name)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -473,7 +473,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tvec_File_Name obj_vec_File_Name;\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\tRead_Xml_Folder(szPoolPath, obj_vec_File_Name);\n");
+		sprintf_safe(szTemp, 200, "\tRead_Json_Folder(szPoolPath, obj_vec_File_Name);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\tfor(int i = 0; i <(int)obj_vec_File_Name.size(); i++)\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -677,7 +677,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	sprintf_safe(szTemp, 200, "}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-	sprintf_safe(szTemp, 200, "int Chlid_Run()\n");
+	sprintf_safe(szTemp, 200, "int Child_Run()\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -691,15 +691,49 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	//读取Cache文件路径
 	sprintf_safe(szTemp, 200, "\tdictionary* pDictionary = NULL;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tpDictionary = iniparser_load(\"cfg/DBServer.ini\");\n");
+	sprintf_safe(szTemp, 200, "\tpDictionary = iniparser_load(\"../cfg/DBServer.ini\");\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tchar* pFileData = iniparser_getstring(pDictionary, \"CacheFile:FilePath\", NULL);\n\n");
+	sprintf_safe(szTemp, 200, "\tif(NULL == pDictionary)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tchar* pFileBakData = iniparser_getstring(pDictionary, \"CacheFile:FileBakPath\", NULL);\n\n");
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tprintf(\"[Child_Run]Ini File is error.\\n\");\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\treturn 0;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tchar szFileData[200] = {'\\0'};\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tchar szFileBakData[200] = {'\\0'};\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tchar* pData = NULL;\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tpData = iniparser_getstring(pDictionary, \"CacheFile:FilePath\", NULL);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tif(NULL != pData)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tsprintf(szFileData, \"%%s\", pData);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tpData = iniparser_getstring(pDictionary, \"CacheFile:FileBakPath\", NULL);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tif(NULL != pData)\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\tsprintf(szFileBakData, \"%%s\", pData);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tiniparser_freedict(pDictionary);\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	
+	sprintf_safe(szTemp, 200, "\tprintf(\"[Child_Run]pFileData=%%s,pFileBakData=%%s.\\n\", szFileData, szFileBakData);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	sprintf_safe(szTemp, 200, "\twhile(true)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t{\n");
@@ -712,16 +746,19 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 		//判断是否有Pool需要声明
 		if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Class_Pool > 0 && strlen(obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_key) > 0)
 		{
+			//这里添加数据库入库代码
 			sprintf_safe(szTemp, 200, "\t\tSave_%s_Pool_Proc();\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\t\tRead_%s_File_Cache(pFileData, pFileBakData);\n",
+			sprintf_safe(szTemp, 200, "\t\tRead_%s_File_Cache(szFileData, szFileBakData);\n",
 				obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		}
 	}
-	//这里添加数据库入库代码
+	sprintf_safe(szTemp, 200, "\t\tprintf(\"[Child_Run]Run OK.\\n\");\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	
 	sprintf_safe(szTemp, 200, "\t\tnanosleep(&tsSleep, NULL);\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t}\n");
@@ -786,13 +823,13 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 	//读Ini程序
-	sprintf_safe(szTemp, 200, "void Read_DB_Ini()\n");
+	sprintf_safe(szTemp, 200, "bool Read_DB_Ini()\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "{\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tdictionary* pDictionary = NULL;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tpDictionary = iniparser_load(\"cfg/DBServer.ini\");\n");
+	sprintf_safe(szTemp, 200, "\tpDictionary = iniparser_load(\"../cfg/DBServer.ini\");\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tif(NULL == pDictionary)\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -800,7 +837,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\tprintf(\"[Read_DB_Ini]Read DB Server Ini Error.\\n\");\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t\treturn;\n");
+	sprintf_safe(szTemp, 200, "\t\treturn false;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -854,7 +891,18 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tiniparser_freedict(pDictionary);\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tprintf(\"[Read_DB_Ini]sz_DB_IP=%%s.\\n\", sz_DB_IP);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tprintf(\"[Read_DB_Ini]sz_DB_Name=%%s.\\n\", sz_DB_Name);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tprintf(\"[Read_DB_Ini]sz_DB_User=%%s.\\n\", sz_DB_User);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\tprintf(\"[Read_DB_Ini]sz_DB_Pass=%%s.\\n\", sz_DB_Pass);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
 	sprintf_safe(szTemp, 200, "\tConnPool::GetInstance()->InitConnPool(sz_DB_IP, sz_DB_User, sz_DB_Pass, 1, 1);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\treturn true;\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "}\n\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -884,7 +932,13 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tsprintf(szFileName, \"./DBwatch.lk\", getenv(\"HOME\"));\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\tRead_DB_Ini();\n");
+	sprintf_safe(szTemp, 200, "\tif(false == Read_DB_Ini())\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t{\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t\texit(0);\n");
+	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+	sprintf_safe(szTemp, 200, "\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\tfd_lock = open(szFileName, O_RDWR|O_CREAT, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH);\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -962,7 +1016,7 @@ bool Create_DB_Server_Main_CPP(_DB_Server_Info& obj_DB_Server_Info, _XML_Proc& o
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t\t\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-	sprintf_safe(szTemp, 200, "\t\t\t\tChlid_Run();\n");
+	sprintf_safe(szTemp, 200, "\t\t\t\tChild_Run();\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 	sprintf_safe(szTemp, 200, "\t\t\t}\n");
 	fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1120,14 +1174,14 @@ bool Create_Make_File(_XML_Proc& obj_XML_Proc)
 		{
 			if(obj_XML_Proc.m_obj_vec_Table_Info[i].m_n_Need_Logic_Class == 1)
 			{
-				sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s.o \\\n",
+				sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s.o ../DataWrapper/%s_Logic.o \\\n",
+					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
 			else
 			{
-				sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s.o ../DataWrapper/%s_Logic.o \\\n",
-					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name,
+				sprintf_safe(szTemp, 200, "\t\t../DataWrapper/%s.o\\\n",
 					obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			}
