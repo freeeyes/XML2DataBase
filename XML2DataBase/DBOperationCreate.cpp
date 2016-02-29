@@ -69,7 +69,7 @@ void Check_DB_Include_File(_Table_Info obj_Class_Info, _XML_Proc& obj_XML_Proc, 
 			{
 				//比较是否已经存在
 				bool blIsFind = false;
-				for(int k = 0; (int)obj_vec_Include_Info.size(); k++)
+				for(int k = 0; k < (int)obj_vec_Include_Info.size(); k++)
 				{
 					if(strcmp(obj_Class_Info.m_obj_vec_Column_Info[i].m_sz_Class_Type, obj_vec_Include_Info[k].m_szInclude) == 0)
 					{
