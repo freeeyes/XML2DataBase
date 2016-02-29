@@ -554,16 +554,35 @@ bool Create_Class_H(_XML_Proc& obj_XML_Proc)
 
 				if (!bfindLogic)
 				{
-					sprintf_safe(szTemp, 200, "\tvoid set_%s(%s obj_%s);\n", 
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					
+					if(Check_Is_Base_Type(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, obj_XML_Proc) == true)
+					{
+						//基础类型直接返回对象
+						sprintf_safe(szTemp, 200, "\tvoid set_%s(%s obj_%s);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-					sprintf_safe(szTemp, 200, "\t%s get_%s();\n", 
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+						sprintf_safe(szTemp, 200, "\t%s get_%s();\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
+					else
+					{
+						//自定义类返回指针
+						sprintf_safe(szTemp, 200, "\tvoid set_%s(%s obj_%s);\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+						sprintf_safe(szTemp, 200, "\t%s* get_%s();\n", 
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
+							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+					}
 				}
 			}
 			else
