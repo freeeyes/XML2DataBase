@@ -326,7 +326,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, sizeof(szTemp), "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[10240] = {0};\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[1024000] = {0};\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tMysqlEncap* pme = ConnPool::GetInstance()->GetOneConn();\n");
@@ -636,7 +636,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, sizeof(szTemp), "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[10240] = {0};\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[1024000] = {0};\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tMysqlEncap* pme = ConnPool::GetInstance()->GetOneConn();\n");
@@ -843,7 +843,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, sizeof(szTemp), "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[10240] = {0};\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[1024000] = {0};\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tMysqlEncap* pme = ConnPool::GetInstance()->GetOneConn();\n");
@@ -1051,7 +1051,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, sizeof(szTemp), "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[10240] = {0};\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[1024000] = {0};\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tMysqlEncap* pme = ConnPool::GetInstance()->GetOneConn();\n");
@@ -1149,7 +1149,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 
 			sprintf_safe(szTemp, sizeof(szTemp), "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[10240] = {0};\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tchar szSql[1024000] = {0};\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tMysqlEncap* pme = ConnPool::GetInstance()->GetOneConn();\n");
