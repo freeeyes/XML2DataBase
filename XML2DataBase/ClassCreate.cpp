@@ -1590,9 +1590,8 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "float") == 0 ||
 						strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "double") == 0)
 					{
-						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", (%s)m_obj_%s, allocator);\n", 
+						sprintf_safe(szTemp, 200, "\td.AddMember(\"%s\", (double)m_obj_%s, allocator);\n", 
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
-							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
