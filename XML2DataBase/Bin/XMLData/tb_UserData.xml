@@ -11,6 +11,7 @@
 		<Column name="cumulate" dbtype="int" classtype="int" value="0" />
 		<!-- 当前叠加数量 -->
 		<Column name="maxcumulate" dbtype="int" classtype="int" value="0" />
+		<Column name="testfloat" dbtype="float" classtype="float" value="0.0f" />
 		<Column name="skill" dbtype="varchar" classtype="char" length="256" value="'\0'" />
 		<!-- 扩展属性 -->
 		<Column name="extraattributes" dbtype="int" classtype="int" length="50" value="0" />
