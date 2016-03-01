@@ -329,7 +329,7 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "{\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tif(NULL != pFile)\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
+			sprintf_safe(szTemp, 200, "\tif(NULL != pData)\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 			
 			sprintf_safe(szTemp, 200, "\t{\n");
