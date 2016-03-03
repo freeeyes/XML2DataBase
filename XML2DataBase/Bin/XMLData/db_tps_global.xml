@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<configer ProcName="DBTest" DB="mysql">
+	<TableClass database="db_tps_global" table="tb_useridlimit" class="CUserIdLimit" key="sid" func="select;insert;update;delete;" desc="">
+		<Column name="sid" dbtype="int" classtype="int" value="0" />
+		<Column name="useridlimit" dbtype="int" classtype="int" value="0" />
+		<Column name="curuserid" dbtype="int" classtype="int" value="0" />
+	</TableClass>
+</configer>
