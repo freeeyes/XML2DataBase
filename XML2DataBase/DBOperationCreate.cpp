@@ -399,13 +399,13 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				}
 			}
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tpme->ExecuteQuery(strSql.c_str(),vmResultData);\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tpme->ExecuteQuery(szSql,vmResultData);\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\tif (1 != vmResultData.size())\n");
@@ -456,7 +456,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s()->unserialization(vmResultData[0][\"%s\"]);\n", 
-									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, 
+									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, 
 									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -476,7 +476,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 							sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.get_%s()->unserialization(vmResultData[0][\"%s\"]);\n", 
-								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, 
+								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name, 
 								obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
@@ -799,13 +799,13 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				strObjValue.c_str());
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->Execute(strSql.c_str()))\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->Execute(szSql))\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
@@ -1007,13 +1007,13 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				strObjValue.c_str());
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->Execute(strSql.c_str()))\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->Execute(szSql))\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
@@ -1102,13 +1102,13 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				}
 			}
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
-			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+			//sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
+			//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->Execute(strSql.c_str()))\n");
+			sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->Execute(szSql))\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
@@ -1227,13 +1227,13 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				}
 
-				sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
+				//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
+				//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->ExecuteQuery(strSql.c_str(),vmResultData))\n");
+				sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->ExecuteQuery(szSql,vmResultData))\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 				sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
@@ -1484,13 +1484,13 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 					strValue.c_str());
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//sprintf_safe(szTemp, sizeof(szTemp), "\tstring strSql = szSql;\n");
+				//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
-				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+				//sprintf_safe(szTemp, 200, "\tstrSql = replace_all_distinct(strSql,\"\\\"\",\"\\\\\\\"\");\n");
+				//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->ExecuteQuery(strSql.c_str(),%s))\n",strReturnValue.c_str());
+				sprintf_safe(szTemp, sizeof(szTemp), "\tif (!pme->ExecuteQuery(szSql,%s))\n",strReturnValue.c_str());
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 				sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
