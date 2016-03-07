@@ -1529,10 +1529,7 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 				}
 				else
 				{
-					sprintf_safe(szTemp, 200, "\tint i = 0;\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-
-					sprintf_safe(szTemp, 200, "\tfor(i = 0; i < %d; i++);\n", 
+					sprintf_safe(szTemp, 200, "\tfor(int i = 0; i < %d; i++);\n", 
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_n_Length);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					
