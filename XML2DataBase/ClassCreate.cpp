@@ -1642,8 +1642,9 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-					sprintf_safe(szTemp, 200, "\t\tarray_%s.PushBack(object, allocator);\n",
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
+					sprintf_safe(szTemp, 200, "\t\tarray_%s.PushBack(object%s, allocator);\n",
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
+						obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Class_Name);
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 					sprintf_safe(szTemp, 200, "\t}\n");
