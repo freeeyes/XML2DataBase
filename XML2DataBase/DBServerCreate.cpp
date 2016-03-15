@@ -505,7 +505,7 @@ bool Create_DB_Server_Pool_CPP(_XML_Proc& obj_XML_Proc)
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\tchar* pFileBuff = new char[nFileSize + 1];\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-		sprintf_safe(szTemp, 200, "\t\t\tfread(pFileBuff, nFileSize, sizeof(char), pFile);\n");
+		sprintf_safe(szTemp, 200, "\t\t\tfread(pFileBuff, sizeof(char), nFileSize, pFile);\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 		sprintf_safe(szTemp, 200, "\t\t\tpFileBuff[nFileSize] = '\\0';\n");
 		fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
