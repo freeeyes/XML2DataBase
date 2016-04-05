@@ -48,6 +48,11 @@ bool MysqlEncap::Connect(const char* ip, const char* username, const
     {
         throw mysql_error(&sql_conn);
     }
+	
+	//add by freeeyes
+	//设置mysql重连
+	char value = 1;
+	mysql_options(&sql_conn, MYSQL_OPT_RECONNECT, &value);
 
     isConnected = true;
     //printf("connect establish [user:%s]\n",username);
@@ -108,6 +113,9 @@ bool MysqlEncap::ExecuteQuery(const char* sql, vector < map<string, string> >& v
         fprintf(stderr,"connection was not established\n");
         bCommit = false;//如果有事务，出错不能提交
     }
+	
+	//添加mysql_ping(),保证连接存活
+	mysql_ping(&sql_conn);
 
     try
     {
