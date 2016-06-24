@@ -338,10 +338,10 @@ bool Create_Class_Pool_CPP(_XML_Proc& obj_XML_Proc)
 			sprintf_safe(szTemp, 200, "\t\tupdate_%s(*pData);\n",obj_XML_Proc.m_obj_vec_Table_Info[i].m_sz_Table_Name);
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\t\treturn 0;\n");
+			sprintf_safe(szTemp, 200, "\t}\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-			sprintf_safe(szTemp, 200, "\t}\n");
+			sprintf_safe(szTemp, 200, "\treturn 0;\n");
 			fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
 			sprintf_safe(szTemp, 200, "}\n\n");

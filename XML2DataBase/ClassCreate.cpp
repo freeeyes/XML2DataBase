@@ -2127,35 +2127,30 @@ bool Create_Class_CPP(_XML_Proc& obj_XML_Proc)
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t\t{\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\tif (doc[\"%s\"][i].IsObject())\n",
-						obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
-					sprintf_safe(szTemp, 200, "\t\t\t\t{\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
+
+					
 					if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "float") == 0)
 					{
-						sprintf_safe(szTemp, 200, "\t\t\t\t\tm_obj_%s[i] = (float)doc[\"%s\"][i].GetDouble();\n",
+						sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s[i] = (float)doc[\"%s\"][i].GetDouble();\n",
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 					else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "double") == 0)
 					{
-						sprintf_safe(szTemp, 200, "\t\t\t\t\tm_obj_%s[i] = (double)doc[\"%s\"][i].GetDouble();\n",
+						sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s[i] = (double)doc[\"%s\"][i].GetDouble();\n",
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 					else
 					{
-						sprintf_safe(szTemp, 200, "\t\t\t\t\tm_obj_%s[i] = doc[\"%s\"][i].GetInt();\n",
+						sprintf_safe(szTemp, 200, "\t\t\t\tm_obj_%s[i] = doc[\"%s\"][i].GetInt();\n",
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 							obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 						fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					}
 
-					sprintf_safe(szTemp, 200, "\t\t\t\t}\n");
-					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t\t}\n");
 					fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 					sprintf_safe(szTemp, 200, "\t\t}\n");

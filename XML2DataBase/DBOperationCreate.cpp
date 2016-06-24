@@ -285,7 +285,7 @@ bool Create_DB_H(_XML_Proc& obj_XML_Proc)
 
 bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 {
-	char szTemp[1024]         = {'\0'};
+	char szTemp[10240]         = {'\0'};
 	char szPathFile[200]      = {'\0'};
 	char szSQL[MAX_BUFF_1024] = {'\0'};
 
