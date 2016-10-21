@@ -374,7 +374,7 @@ bool CXmlOpeation::Parse_XML_Table_File(const char* pFileName, _XML_Proc& obj_XM
 					_Table_Ext_SQL obj_Table_Ext_SQL;
 					if(NULL != pColumnNode->ToElement()->Attribute("value"))
 					{
-						sprintf_safe(obj_Table_Ext_SQL.m_sz_Sql_Text, MAX_BUFF_100, "%s", pColumnNode->ToElement()->Attribute("value"));
+						sprintf_safe(obj_Table_Ext_SQL.m_sz_Sql_Text, MAX_BUFF_1024, "%s", pColumnNode->ToElement()->Attribute("value"));
 					}
 					
 					if(NULL != pColumnNode->ToElement()->Attribute("funcname"))

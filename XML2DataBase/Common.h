@@ -164,7 +164,7 @@ typedef vector<_Table_Ext_Index> vec_Table_Ext_Index;
 
 struct _Table_Ext_SQL
 {
-	char m_sz_Sql_Text[MAX_BUFF_100];
+	char m_sz_Sql_Text[MAX_BUFF_1024];
 	char m_sz_Func_Name[MAX_BUFF_50];
 	char m_sz_Input_Value[MAX_BUFF_100];
 	int  m_n_Select_Type;

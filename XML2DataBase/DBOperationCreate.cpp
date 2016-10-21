@@ -1257,7 +1257,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 				sprintf_safe(szTemp, sizeof(szTemp), "\t{\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-				sprintf_safe(szTemp, sizeof(szTemp), "\t\tfor(int iLoop = 0; iLoop != vmResultData.size(); ++iLoop)\n");
+				sprintf_safe(szTemp, sizeof(szTemp), "\t\tfor(int iLoop = 0; iLoop < vmResultData.size(); iLoop++)\n");
 				fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 				
 				sprintf_safe(szTemp, sizeof(szTemp), "\t\t{\n");
@@ -1305,7 +1305,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 									//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
 									//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[0][\"%s\"]);\n", 
+									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[iLoop][\"%s\"]);\n", 
 										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1325,7 +1325,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 								//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
 								//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[0][\"%s\"]);\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[iLoop][\"%s\"]);\n", 
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1339,21 +1339,21 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 						{
 							if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type, "int") == 0)
 							{
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(atoi((char*)vmResultData[0][\"%s\"].c_str()));\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s(atoi((char*)vmResultData[iLoop][\"%s\"].c_str()));\n", 
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 							}
 							else if((strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "float") == 0)||(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "double") == 0))
 							{
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(atof((char*)vmResultData[0][\"%s\"].c_str()));\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\tobj.set_%s(atof((char*)vmResultData[iLoop][\"%s\"].c_str()));\n", 
 									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name,
 									obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 							}
 							else if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type, "char") == 0)
 							{
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[iLoop][\"%s\"].c_str());\n", 
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1372,7 +1372,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 										//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
 										//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-										sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[0][\"%s\"]);\n", 
+										sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[iLoop][\"%s\"]);\n", 
 											obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 											obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 										fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1392,7 +1392,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 									//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
 									//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[0][\"%s\"]);\n", 
+									sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[iLoop][\"%s\"]);\n", 
 										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 										obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 									fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1412,7 +1412,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 							//	obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type);
 							//fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 
-							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[0][\"%s\"]);\n", 
+							sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.get_%s()->unserialization(vmResultData[iLoop][\"%s\"]);\n", 
 								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name, 
 								obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 							fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
@@ -1426,14 +1426,14 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
 							if(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Class_Type, "char") == 0)
 							{
 								//如果是字符串，特殊处理
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[iLoop][\"%s\"].c_str());\n", 
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
 							}
 							else
 							{
-								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[0][\"%s\"].c_str());\n", 
+								sprintf_safe(szTemp, sizeof(szTemp), "\t\t\tobj.set_%s((char*)vmResultData[iLoop][\"%s\"].c_str());\n", 
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name,
 									obj_XML_Proc.m_obj_vec_Table_Info[iLoop].m_obj_vec_Column_Info[k].m_sz_Column_Name);
 								fwrite(szTemp, strlen(szTemp), sizeof(char), pFile);
