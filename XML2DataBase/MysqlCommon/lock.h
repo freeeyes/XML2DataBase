@@ -17,7 +17,11 @@
 #ifndef LOCK_H_
 #define LOCK_H_
 
+#ifdef WIN32
+#include <Windows.h>
+#else
 #include <pthread.h>
+#endif
 
 /************************************************
 * mutex api的简单封装
@@ -27,24 +31,44 @@ class MutexLock
 public:
     MutexLock()
     {
+#ifdef WIN32
+        InitializeCriticalSection(&mutex_);
+#else
         pthread_mutex_init(&mutex_, NULL);
+#endif
     }
     ~MutexLock()
     {
+#ifdef WIN32
+        DeleteCriticalSection(&mutex_);
+#else
         pthread_mutex_destroy(&mutex_);
+#endif
     }
 
     void Lock()
     {
+#ifdef WIN32
+        EnterCriticalSection(&mutex_);
+#else
         pthread_mutex_lock(&mutex_);
+#endif
     }
     void UnLock()
     {
+#ifdef WIN32
+        LeaveCriticalSection(&mutex_);
+#else
         pthread_mutex_unlock(&mutex_);
+#endif
     }
 
 private:
+#ifdef WIN32
+    CRITICAL_SECTION mutex_;
+#else
     pthread_mutex_t mutex_;
+#endif
 
 private:
     //禁止copy
