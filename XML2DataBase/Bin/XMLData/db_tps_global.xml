@@ -1,9 +1,54 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 
-<configer ProcName="DBTest" DB="mysql">
-	<TableClass database="db_tps_global" table="tb_useridlimit" class="CUserIdLimit" key="sid" func="select;insert;update;delete;" desc="">
-		<Column name="sid" dbtype="int" classtype="int" value="0" />
-		<Column name="useridlimit" dbtype="int" classtype="int" value="0" />
-		<Column name="curuserid" dbtype="int" classtype="int" value="0" />
+<configer ProcName="minegamebd" DB="mysql">
+	
+	<TableClass database="minegamebd" table="alluserinfo_table" class="CAllUserInfo_Table" key="uroleId" func="select;insert;update;delete;"desc="">
+		<Column name="strCode" dbtype="varchar" classtype="string" value='""' />
+		<Column name="uroleId" dbtype="int" classtype="int" value="0" />
+		<Column name="uRankId" dbtype="int" classtype="int" value="0" />
+		<Column name="strHeadUrl" dbtype="varchar" classtype="string" value='""' />
+		<Column name="strName" dbtype="varchar" classtype="string" value='""' />
+		<Column name="fCurMineNum" dbtype="float" classtype="float" value="0" />
+		<Column name="uCurForce" dbtype="int" classtype="int" value="0" />
+		<Column name="uQuestRewardsId" dbtype="int" classtype="int" value="0" />
+		<Column name="strUnlineTime" dbtype="datetime" classtype="string" value='""' />
 	</TableClass>
+
+	<TableClass database="minegamebd" table="rankinglist_table" class="CRankList_Table" desc="">
+		<Column name="strCode" dbtype="varchar" classtype="string" value='""' />
+		<Column name="strUserName" dbtype="varchar" classtype="string" value='""' />
+		<Column name="strHeadUrl" dbtype="varchar" classtype="string" value='""' />
+		<Column name="fMineNum" dbtype="float" classtype="float" value="0" />
+		<Column name="uProceNum" dbtype="int" classtype="int" value="0" />
+		<Column name="strUpdateTime" dbtype="varchar" classtype="string" value='""' />
+	</TableClass>
+	
+	<TableClass database="minegamebd" table="task_table" class="CTask_Table" desc="">
+		<Column name="uTaskId" dbtype="int" classtype="int" value="0" />
+		<Column name="strTaskName" dbtype="varchar" classtype="string" value='""' />
+		<Column name="strTaskDescribe" dbtype="varchar" classtype="string" value='""' />
+		<Column name="bTaskCurState" dbtype="tinyint" classtype="bool" value="0" />
+		<Column name="uProcePriceNum" dbtype="int" classtype="int" length="11" value="0" />
+	</TableClass>
+	
+	<TableClass database="minegamebd" table="relation_table" class="CRelation_Table" desc="">
+		<Column name="strCode" dbtype="varchar" classtype="string" value='""' />
+		<Column name="strUserName" dbtype="varchar" classtype="string" value='""' />
+		<Column name="strHeadUrl" dbtype="varchar" classtype="string" value='""' />
+		<Column name="fMineNum" dbtype="float" classtype="float" value="0" />
+		<Column name="uProceNum" dbtype="int" classtype="int"  value="0" />
+		<Column name="strUpdateTime" dbtype="timestamp" classtype="string" value='""' />
+	</TableClass> 
+	
+	<TableExt database="minegamebd" table="userinfo_table" class="CAllUserInfo_Table" desc="">
+		<!-- 扩展sql只支持查询操作,不支持其他操作 
+		  selecttype为1表示查询正常的数据库记录,此时返回数据类型如 vector<CUserData>& vecObj;
+		  为2数值时表示非正常数据库记录比如 count(*)或者查询指定的字段信息,此时返回数据类型如 vector < map<string, string> >& vmResultData;使用者需要对返回的字段值自己处理	
+		-->
+		<Sql value="select * from alluserinfo_table.uroleId order by activetime desc limit 300;" funcname="select_tb_alluserinfo_for_pool" selecttype="1" forpool="1" inputvalue="vector<CAllUserInfo_Table>&amp; vecObj"/>
+
+		<Sql value="select id from alluserinfo_table.uroleId where uroleId = '%s';" funcname="select_tb_alluserinfo_by_uroleId" selecttype="2" inputvalue="char* szroleId,vector<map<string,string> >&amp; vmResultData"/>
+
+		<Sql value="select id from alluserinfo_table.strName where strName = '%s';" funcname="select_tb_alluserinfo_by_strName" selecttype="2" inputvalue="char* strName,vector<map<string,string> >&amp; vmResultData"/>
+	</TableExt>
 </configer>
