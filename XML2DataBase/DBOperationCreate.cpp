@@ -738,6 +738,10 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
                     {
                         strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
                     }
+                    else if (strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "string") == 0)
+                    {
+                        strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+                    }
                     else
                     {
                         strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()->serialization().c_str(), ";
@@ -778,7 +782,7 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
                     }
                     else if (strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "string") == 0)
                     {
-                        strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+                        strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "()";
                     }
                     else
                     {
@@ -814,6 +818,10 @@ bool Create_DB_CPP(_XML_Proc& obj_XML_Proc)
                         strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
                     }
                     else if((strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "float") == 0)||(strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "double") == 0))
+                    {
+                        strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
+                    }
+                    else if (strcmp(obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Class_Type, "string") == 0)
                     {
                         strObjValue = strObjValue + "obj.get_" + obj_XML_Proc.m_obj_vec_Table_Info[i].m_obj_vec_Column_Info[j].m_sz_Column_Name + "(), ";
                     }
